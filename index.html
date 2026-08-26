@@ -747,7 +747,7 @@
       }
       if(driveAccessToken){ resolve(driveAccessToken); return; }
       _driveResolve = resolve; _driveReject = reject;
-      getDriveTokenClient().requestAccessToken({prompt:''});
+      getDriveTokenClient().requestAccessToken({prompt:'consent'});
     });
   }
   function uploadPdfToDrive(blob, filename){
