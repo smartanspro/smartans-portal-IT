@@ -40,6 +40,32 @@ Las fichas se guardan en el `localStorage` del navegador (clave `smartans_portal
 - Si se borra el historial/datos de navegación del sitio, o se abre el archivo desde otra carpeta/URL, las fichas guardadas no van a aparecer.
 - Para compartir una ficha con otra persona, la forma confiable es exportarla a PDF y enviar ese archivo — no el estado guardado en el navegador.
 
+## Enviar por WhatsApp con el PDF en Google Drive
+
+El botón **"📱 Enviar por WhatsApp"** sube el PDF a esta carpeta de Drive: https://drive.google.com/drive/folders/1ngNIzPC7Hhu5vTurAJApxeCgcO7IvpkY , la hace pública ("cualquiera con el link puede ver") y arma el mensaje de WhatsApp con ese link, igual que los mensajes que ya mandás a los clientes.
+
+**Mientras no esté configurado**, el botón funciona igual pero con el modo anterior: descarga el PDF localmente y abre WhatsApp con el texto pidiendo que lo adjuntes a mano — no rompe nada, solo no incluye el link.
+
+Para activar la subida automática hacen falta dos cosas, y las dos son necesarias — con una sola no alcanza:
+
+### 1. Alojar el portal en una URL real (no `file://`)
+
+Google no permite el login de Drive en un archivo abierto con doble clic. Subilo a GitHub Pages (ver sección de abajo) u otro hosting estático; después de subirlo a GitHub, activá GitHub Pages en Settings → Pages → Branch `main` → Save. Vas a obtener una URL como `https://<tu-usuario>.github.io/<tu-repo>/`.
+
+### 2. Crear el Client ID de Google Cloud Console
+
+1. Entrá a [console.cloud.google.com](https://console.cloud.google.com) y creá un proyecto (o usá uno existente).
+2. Menú → **APIs & Services → Library** → buscá **"Google Drive API"** → **Enable**.
+3. Menú → **APIs & Services → OAuth consent screen** → tipo **External** → completá nombre de la app, tu email → guardá (no hace falta publicarla, alcanza con dejarla en modo "Testing" y agregarte a vos mismo como usuario de prueba en esa misma pantalla).
+4. Menú → **APIs & Services → Credentials → Create Credentials → OAuth client ID** → tipo **Web application**.
+5. En **Authorized JavaScript origins** agregá la URL del paso 1 (ej. `https://<tu-usuario>.github.io`), sin ruta al final.
+6. Creá la credencial y copiá el **Client ID** (termina en `.apps.googleusercontent.com`).
+7. Abrí `index.html`, buscá la línea `var GOOGLE_CLIENT_ID = 'PEGAR_TU_CLIENT_ID_AQUI...'` y pegá tu Client ID ahí.
+
+La carpeta de Drive de destino ya está configurada (`DRIVE_FOLDER_ID` en el código) — solo asegurate de que la cuenta de Google con la que inicies sesión tenga permiso de **Editor** sobre esa carpeta.
+
+La primera vez que uses el botón con todo configurado, el navegador va a abrir un popup de Google pidiendo autorización — aceptalo una sola vez por sesión.
+
 ## Cómo subirlo a GitHub
 
 1. Generá un Personal Access Token en GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens (con permiso de escritura sobre el repo).

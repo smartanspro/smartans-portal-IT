@@ -5,6 +5,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
   :root{
@@ -668,9 +669,7 @@
       return downloads.save({filename:filename, data:blob}).then(function(){ return {ok:true}; }).catch(function(err){ return {ok:false, err:err}; });
     });
   }
-  function exportarPDF(previewId, filenameBase, bgColor){
-    var loading = document.getElementById('loading');
-    loading.classList.add('show');
+  function generatePdfBlob(previewId, bgColor){
     var fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
     return fontsReady.then(function(){
       var node = document.getElementById(previewId);
@@ -683,9 +682,15 @@
         var JsPdfCtor = window.jspdf.jsPDF;
         var doc = new JsPdfCtor({unit:'mm', format:[pdfW, pdfH], orientation: pdfH>=pdfW?'portrait':'landscape', compress:true});
         doc.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH, undefined, 'FAST');
-        var pdfBlob = doc.output('blob');
-        return saveFile(pdfBlob, 'Ficha_'+slug(filenameBase)+'.pdf');
+        return doc.output('blob');
       });
+    });
+  }
+  function exportarPDF(previewId, filenameBase, bgColor){
+    var loading = document.getElementById('loading');
+    loading.classList.add('show');
+    return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
+      return saveFile(pdfBlob, 'Ficha_'+slug(filenameBase)+'.pdf');
     }).then(function(res){
       if(res && res.ok) showToast(res.legacy ? 'PDF descargado.' : 'Confirmá la descarga para guardar el PDF.');
       else if(res) showToast('No se pudo guardar el PDF.', true);
@@ -695,11 +700,100 @@
       throw err;
     }).finally(function(){ loading.classList.remove('show'); });
   }
-  function openWhatsAppShare(previewId, filenameBase, bgColor, waText){
-    return exportarPDF(previewId, filenameBase, bgColor).then(function(){
-      window.open('https://wa.me/?text=' + encodeURIComponent(waText), '_blank', 'noopener');
-      showToast('PDF descargado — adjuntalo en el chat que abriste en WhatsApp.');
-    }).catch(function(){ /* exportarPDF ya mostró el toast de error */ });
+
+  /* ============================================================
+     GOOGLE DRIVE — subida del PDF + link público
+     Requiere: 1) el portal alojado en un dominio http(s), no file://
+               2) un OAuth Client ID de Google Cloud Console configurado abajo
+     Ver README para los pasos de configuración.
+  ============================================================ */
+  var GOOGLE_CLIENT_ID = 'PEGAR_TU_CLIENT_ID_AQUI.apps.googleusercontent.com';
+  var DRIVE_FOLDER_ID = '1ngNIzPC7Hhu5vTurAJApxeCgcO7IvpkY';
+  var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+  var driveAccessToken = null;
+  var driveTokenClient = null;
+  var _driveResolve = null, _driveReject = null;
+
+  function driveConfigured(){
+    return !!GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.indexOf('PEGAR_TU_CLIENT_ID') !== 0;
+  }
+  function getDriveTokenClient(){
+    if(driveTokenClient) return driveTokenClient;
+    driveTokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: function(resp){
+        if(resp.error){ if(_driveReject) _driveReject(new Error(resp.error)); return; }
+        driveAccessToken = resp.access_token;
+        setTimeout(function(){ driveAccessToken = null; }, Math.max(60000, (resp.expires_in||3600)*1000 - 60000));
+        if(_driveResolve) _driveResolve(driveAccessToken);
+      }
+    });
+    return driveTokenClient;
+  }
+  function ensureDriveAuth(){
+    return new Promise(function(resolve, reject){
+      if(location.protocol === 'file:'){
+        reject(new Error('El portal está abierto como archivo local (file://); Google Drive solo funciona si está alojado en una URL http(s).'));
+        return;
+      }
+      if(!driveConfigured()){
+        reject(new Error('Falta configurar el Client ID de Google Drive en el código (ver README).'));
+        return;
+      }
+      if(!window.google || !window.google.accounts || !window.google.accounts.oauth2){
+        reject(new Error('No se pudo cargar el inicio de sesión de Google (revisá tu conexión a internet).'));
+        return;
+      }
+      if(driveAccessToken){ resolve(driveAccessToken); return; }
+      _driveResolve = resolve; _driveReject = reject;
+      getDriveTokenClient().requestAccessToken({prompt:''});
+    });
+  }
+  function uploadPdfToDrive(blob, filename){
+    return ensureDriveAuth().then(function(token){
+      var metadata = {name: filename, parents: [DRIVE_FOLDER_ID], mimeType: 'application/pdf'};
+      var form = new FormData();
+      form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
+      form.append('file', blob);
+      return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+        method:'POST',
+        headers:{ 'Authorization':'Bearer ' + token },
+        body: form
+      }).then(function(r){
+        if(!r.ok) return r.text().then(function(t){ throw new Error('Drive rechazó la subida (' + r.status + '): ' + t); });
+        return r.json();
+      });
+    }).then(function(fileData){
+      return fetch('https://www.googleapis.com/drive/v3/files/' + fileData.id + '/permissions', {
+        method:'POST',
+        headers:{ 'Authorization':'Bearer ' + driveAccessToken, 'Content-Type':'application/json' },
+        body: JSON.stringify({role:'reader', type:'anyone'})
+      }).then(function(r){
+        if(!r.ok) return r.text().then(function(t){ throw new Error('No se pudo hacer público el archivo (' + r.status + '): ' + t); });
+        return fileData.webViewLink || ('https://drive.google.com/file/d/' + fileData.id + '/view?usp=sharing');
+      });
+    });
+  }
+  function openWhatsAppShare(previewId, filenameBase, bgColor, buildTextFn){
+    var loading = document.getElementById('loading');
+    loading.classList.add('show');
+    var filename = 'Ficha_'+slug(filenameBase)+'.pdf';
+    return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
+      return uploadPdfToDrive(pdfBlob, filename).then(function(driveLink){
+        window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(driveLink)), '_blank', 'noopener');
+        showToast('PDF subido a Drive — WhatsApp abierto con el link listo.');
+      }).catch(function(driveErr){
+        console.warn('Drive no disponible, uso el flujo manual:', driveErr.message);
+        return saveFile(pdfBlob, filename).then(function(){
+          window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(null)), '_blank', 'noopener');
+          showToast('Drive no disponible (' + driveErr.message + ') — PDF descargado, adjuntalo a mano en WhatsApp.', true);
+        });
+      });
+    }).catch(function(err){
+      console.error(err);
+      showToast('No se pudo generar el PDF'+(err&&err.message?(': '+err.message):'')+'.', true);
+    }).finally(function(){ loading.classList.remove('show'); });
   }
 
   var LOGO_DATAURL = 'data:image/png;base64,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';
@@ -924,7 +1018,7 @@
         exportarPDF('previewCanje', state.nombreProyecto || 'ficha_canje', null);
       });
       document.getElementById('cjBtnWhatsapp').addEventListener('click', function(){
-        openWhatsAppShare('previewCanje', state.nombreProyecto || 'ficha_canje', null, buildWhatsappText());
+        openWhatsAppShare('previewCanje', state.nombreProyecto || 'ficha_canje', null, buildWhatsappText);
       });
     }
 
@@ -944,16 +1038,19 @@
     function getSnapshot(){ return {data: state, hero: heroDataURL, logo: logoDataURL===LOGO_DATAURL ? null : logoDataURL}; }
     function displayName(){ return state.nombreProyecto || 'Ficha sin título'; }
 
-    function buildWhatsappText(){
+    function buildWhatsappText(driveLink){
       var c = calcular(state);
       var nombre = displayName();
+      var linkBlock = driveLink
+        ? ('Más información en el siguiente link:\n' + driveLink + '\n\n')
+        : 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n';
       return 'Hola a todos.\n\n'
         + 'Les paso la ficha de la próxima oportunidad de inversión denominada: *' + nombre + '*.\n\n'
         + 'Tipo de inversión: Compra de terreno y posterior canje por departamentos.\n\n'
         + '🔹 Invertís en la compra del terreno.\n'
         + '🔹 Obtenés metros cuadrados de pozo al mejor valor (rango estimado ' + fmtUSD(c.costoM2Min) + '/m2 - ' + fmtUSD(c.costoM2Max) + '/m2).\n'
         + '🔹 Rentabilidad estimada contra precio de venta (rango estimado ' + fmtPct(c.rentMin,1) + ' - ' + fmtPct(c.rentMax,1) + ').\n\n'
-        + 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n'
+        + linkBlock
         + 'Cualquier duda me consultan.\n'
         + 'Saludos!';
     }
@@ -1140,7 +1237,7 @@
         exportarPDF('previewCredito', state.operacion || 'ficha_credito', '#ffffff');
       });
       document.getElementById('crBtnWhatsapp').addEventListener('click', function(){
-        openWhatsAppShare('previewCredito', state.operacion || 'ficha_credito', '#ffffff', buildWhatsappText());
+        openWhatsAppShare('previewCredito', state.operacion || 'ficha_credito', '#ffffff', buildWhatsappText);
       });
       document.getElementById('crForm').addEventListener('input', function(e){
         var t = e.target; if(!t.name) return;
@@ -1159,17 +1256,20 @@
     function getSnapshot(){ return {data: state}; }
     function displayName(){ return state.operacion || 'Ficha sin título'; }
 
-    function buildWhatsappText(){
+    function buildWhatsappText(driveLink){
       var nombre = displayName();
       var tnas = state.tasas.map(function(t){ return n(t.tna); }).filter(function(v){ return v > 0; });
       var tnaMin = tnas.length ? Math.min.apply(null, tnas) : 0;
       var tnaMax = tnas.length ? Math.max.apply(null, tnas) : 0;
+      var linkBlock = driveLink
+        ? ('Más información en el siguiente link:\n' + driveLink + '\n\n')
+        : 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n';
       return 'Hola a todos.\n\n'
         + 'Les paso la ficha de la próxima operación de inversión denominada: "' + nombre + '".\n\n'
         + '🔹 Moneda: ' + (state.moneda || '') + '.\n'
         + '🔹 Inversión Mínima: ' + fmtUSD(state.inversionMinima) + '.-\n'
         + '🔹 Tasa anual (TNA fija): entre ' + fmtPct(tnaMin,2) + ' y ' + fmtPct(tnaMax,2) + ' (según monto de inversión).\n\n'
-        + 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n'
+        + linkBlock
         + 'Cualquier duda me consultan.\n'
         + 'Saludos!';
     }
