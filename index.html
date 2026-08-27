@@ -764,6 +764,17 @@
     <div class="field" id="userFormActivoWrap" style="display:none;">
       <label style="display:flex; align-items:center; gap:8px; font-weight:600;"><input type="checkbox" id="userFormActivo" style="width:auto;" checked /> Usuario habilitado</label>
     </div>
+    <div class="field">
+      <label>Módulos visibles</label>
+      <div style="display:flex; flex-direction:column; gap:6px; border:1px solid var(--erp-border); border-radius:var(--radius-sm); padding:10px 12px;">
+        <label style="display:flex; align-items:center; gap:8px; font-weight:500; font-size:13px;"><input type="checkbox" class="userFormModulo" value="fichas" style="width:auto;" checked /> Fichas de Inversión</label>
+        <label style="display:flex; align-items:center; gap:8px; font-weight:500; font-size:13px;"><input type="checkbox" class="userFormModulo" value="rpa" style="width:auto;" checked /> RPA</label>
+        <label style="display:flex; align-items:center; gap:8px; font-weight:500; font-size:13px;"><input type="checkbox" class="userFormModulo" value="agentes" style="width:auto;" checked /> Agentes</label>
+        <label style="display:flex; align-items:center; gap:8px; font-weight:500; font-size:13px;"><input type="checkbox" class="userFormModulo" value="monitoreo" style="width:auto;" checked /> Monitoreo</label>
+        <label style="display:flex; align-items:center; gap:8px; font-weight:500; font-size:13px;"><input type="checkbox" class="userFormModulo" value="notificaciones" style="width:auto;" checked /> Notificaciones</label>
+      </div>
+      <div class="hint">"Usuarios y Roles" no está en esta lista: eso lo controla únicamente el rol Administrador, para no bloquearte a vos mismo el panel de administración.</div>
+    </div>
     <div class="modal-foot">
       <button class="btn" type="button" id="btnCancelUsuario">Cancelar</button>
       <button class="btn btn-primary" type="button" id="btnGuardarUsuario" style="margin-left:8px;">Guardar</button>
@@ -893,7 +904,7 @@
      la cuenta que lo desplegó, y acepta el POST de cualquier origen.
      Ver README para los pasos de creación del Apps Script.
   ============================================================ */
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby3e-R93n4c0ovekY7rJKsRKEFUjOOsX-vogH81WFZEvr4mkF8d7te3nsHaT3bamb11/exec';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzUFdpyn29CwlZ6BhGxEmNHqSSCzCbnqQLUIKn9B5FyI5b1evAy8FOP3h156MOTUxA4/exec';
 
   function appsScriptConfigured(){
     return !!APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PEGAR_TU_URL') !== 0;
@@ -1503,7 +1514,11 @@
     usuarios:'viewUsuarios'
   };
   var NAV_MAP = {list:'navFichas', rpa:'navRPA', agentes:'navAgentes', monitoreo:'navMonitoreo', notificaciones:'navNotificaciones', usuarios:'navUsuarios'};
+  var VIEW_MODULE_MAP = {list:'fichas', canje:'fichas', credito:'fichas', rpa:'rpa', agentes:'agentes', monitoreo:'monitoreo', notificaciones:'notificaciones'};
   function showView(name){
+    var mod = VIEW_MODULE_MAP[name];
+    if(mod && allowedModules().indexOf(mod) === -1) name = 'list';
+    if(name === 'usuarios' && !isAdminRole()) name = 'list';
     Object.keys(VIEW_MAP).forEach(function(key){
       document.getElementById(VIEW_MAP[key]).style.display = (key === name) ? '' : 'none';
     });
@@ -1810,14 +1825,18 @@
     document.getElementById('userFormPassword').value = '';
     document.getElementById('userFormPasswordHint').textContent = usuario ? 'Dejalo vacío para no cambiar la contraseña.' : 'Se le va a pedir esta contraseña para entrar al portal.';
     document.getElementById('userFormActivoWrap').style.display = usuario ? '' : 'none';
+    var modChecks = document.querySelectorAll('.userFormModulo');
     if(usuario){
       var u = usersCache.filter(function(x){ return x.usuario === usuario; })[0];
       document.getElementById('userFormRol').value = u ? u.rol : 'usuario';
       document.getElementById('userFormActivo').checked = u ? u.activo : true;
+      var modulos = (u && u.modulos) || [];
+      modChecks.forEach(function(c){ c.checked = modulos.indexOf(c.value) !== -1; });
       document.getElementById('modalUsuarioTitle').textContent = 'Editar usuario';
-      document.getElementById('modalUsuarioSub').textContent = 'Modificá el rol, la contraseña o el estado de este usuario.';
+      document.getElementById('modalUsuarioSub').textContent = 'Modificá el rol, la contraseña, los módulos visibles o el estado de este usuario.';
     } else {
       document.getElementById('userFormRol').value = 'usuario';
+      modChecks.forEach(function(c){ c.checked = true; });
       document.getElementById('modalUsuarioTitle').textContent = 'Nuevo usuario';
       document.getElementById('modalUsuarioSub').textContent = 'Creá un usuario nuevo para el portal.';
     }
@@ -1851,18 +1870,20 @@
       errEl.style.display = 'none';
       if(!usuario){ errEl.textContent = 'Falta el nombre de usuario.'; errEl.style.display = 'block'; return; }
 
+      var modulos = Array.prototype.filter.call(document.querySelectorAll('.userFormModulo'), function(c){ return c.checked; }).map(function(c){ return c.value; });
+
       var btn = document.getElementById('btnGuardarUsuario');
       btn.disabled = true;
 
       var request;
       if(editingUsuario){
         var activo = document.getElementById('userFormActivo').checked;
-        var extra = {usuario: editingUsuario, rol: rol, activo: activo};
+        var extra = {usuario: editingUsuario, rol: rol, activo: activo, modulos: modulos};
         if(password) extra.nuevoPassword = password;
         request = usersRequest('updateUser', extra);
       } else {
         if(!password){ errEl.textContent = 'Falta la contraseña.'; errEl.style.display = 'block'; btn.disabled = false; return; }
-        request = usersRequest('createUser', {usuario:usuario, password:password, rol:rol});
+        request = usersRequest('createUser', {usuario:usuario, password:password, rol:rol, modulos:modulos});
       }
 
       request.then(function(data){
@@ -1933,6 +1954,9 @@
      credenciales hardcodeadas en el HTML. Ver README.
   ============================================================ */
   var SESSION_KEY = 'smartans_portal_session_v1';
+  var ALL_MODULES = ['fichas','rpa','agentes','monitoreo','notificaciones'];
+  var MODULE_NAV_MAP = {fichas:'navFichas', rpa:'navRPA', agentes:'navAgentes', monitoreo:'navMonitoreo', notificaciones:'navNotificaciones'};
+  var MODULE_VIEW_MAP = {fichas:'list', rpa:'rpa', agentes:'agentes', monitoreo:'monitoreo', notificaciones:'notificaciones'};
   var appStarted = false;
   var currentUser = null; // {usuario, rol, password} — password solo en memoria/sessionStorage, nunca en la ficha ni en localStorage persistente
 
@@ -1968,10 +1992,19 @@
     u.value = ''; p.value = ''; u.focus();
     newCaptcha();
   }
+  function allowedModules(){
+    return (currentUser && currentUser.modulos) || ALL_MODULES.slice();
+  }
   function updateAdminNavVisibility(){
     var show = isAdminRole();
     document.getElementById('navAdminGroup').style.display = show ? '' : 'none';
     document.getElementById('navAdminSub').style.display = show ? '' : 'none';
+
+    var allowed = allowedModules();
+    Object.keys(MODULE_NAV_MAP).forEach(function(mod){
+      var el = document.getElementById(MODULE_NAV_MAP[mod]);
+      if(el) el.style.display = (allowed.indexOf(mod) !== -1) ? '' : 'none';
+    });
   }
   function enterApp(){
     document.getElementById('loginScreen').style.display = 'none';
@@ -2003,7 +2036,7 @@
       btn.disabled = true;
       loginRequest(u, p).then(function(data){
         if(data.ok){
-          currentUser = {usuario:u, rol:data.rol, password:p};
+          currentUser = {usuario:u, rol:data.rol, password:p, modulos: data.modulos || ALL_MODULES.slice()};
           saveSession(currentUser);
           enterApp();
         } else {

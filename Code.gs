@@ -81,8 +81,22 @@ function handleUploadPdf(datos) {
 
 /* ============================================================
    USUARIOS — helpers de la hoja de cálculo
-   Columnas: usuario | passwordHash | salt | rol | activo
+   Columnas: usuario | passwordHash | salt | rol | activo | modulos
+   "modulos" es una lista separada por comas con los módulos que ese
+   usuario puede ver (ej: "fichas,rpa,notificaciones"). Si viene vacía
+   (usuarios creados antes de este cambio), se asume acceso a todos.
 ============================================================ */
+var ALL_MODULES = ['fichas', 'rpa', 'agentes', 'monitoreo', 'notificaciones'];
+
+function parseModulos_(raw) {
+  if (!raw) return ALL_MODULES.slice(); // sin dato = todos, por compatibilidad con usuarios viejos
+  return String(raw).split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s; });
+}
+function stringifyModulos_(arr) {
+  if (!arr || !arr.length) return ALL_MODULES.join(',');
+  return arr.join(',');
+}
+
 function getUsersSheet_() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName(USERS_SHEET_NAME);
@@ -91,10 +105,10 @@ function getUsersSheet_() {
   }
   if (sheet.getLastRow() === 0) {
     // hoja recién creada, o ya existía pero completamente vacía: sembramos headers + admin
-    sheet.appendRow(['usuario', 'passwordHash', 'salt', 'rol', 'activo']);
+    sheet.appendRow(['usuario', 'passwordHash', 'salt', 'rol', 'activo', 'modulos']);
     // usuario semilla para el primer ingreso — cambiar la contraseña apenas se pueda
     var salt = makeSalt_();
-    sheet.appendRow(['smartans', hashPassword_('smartans', salt), salt, 'admin', true]);
+    sheet.appendRow(['smartans', hashPassword_('smartans', salt), salt, 'admin', true, ALL_MODULES.join(',')]);
   }
   return sheet;
 }
@@ -136,7 +150,7 @@ function handleLogin(datos) {
     if (hashPassword_(datos.password, row[2]) !== row[1]) {
       return jsonOut({ ok: false, error: 'Usuario o contraseña incorrectos.' });
     }
-    return jsonOut({ ok: true, rol: row[3] });
+    return jsonOut({ ok: true, rol: row[3], modulos: parseModulos_(row[5]) });
   } catch (err) {
     return jsonOut({ ok: false, error: String(err) });
   }
@@ -151,7 +165,7 @@ function handleListUsers(datos) {
   var rows = sheet.getDataRange().getValues();
   var users = [];
   for (var i = 1; i < rows.length; i++) {
-    users.push({ usuario: rows[i][0], rol: rows[i][3], activo: rows[i][4] === true });
+    users.push({ usuario: rows[i][0], rol: rows[i][3], activo: rows[i][4] === true, modulos: parseModulos_(rows[i][5]) });
   }
   return jsonOut({ ok: true, users: users });
 }
@@ -163,7 +177,7 @@ function handleCreateUser(datos) {
   if (findUserRow_(sheet, datos.usuario)) return jsonOut({ ok: false, error: 'Ese usuario ya existe.' });
   var salt = makeSalt_();
   var hash = hashPassword_(datos.password, salt);
-  sheet.appendRow([datos.usuario, hash, salt, datos.rol || 'usuario', true]);
+  sheet.appendRow([datos.usuario, hash, salt, datos.rol || 'usuario', true, stringifyModulos_(datos.modulos)]);
   return jsonOut({ ok: true });
 }
 
@@ -180,6 +194,7 @@ function handleUpdateUser(datos) {
   }
   if (datos.rol) sheet.getRange(found.index, 4).setValue(datos.rol);
   if (typeof datos.activo === 'boolean') sheet.getRange(found.index, 5).setValue(datos.activo);
+  if (datos.modulos) sheet.getRange(found.index, 6).setValue(stringifyModulos_(datos.modulos));
   return jsonOut({ ok: true });
 }
 
