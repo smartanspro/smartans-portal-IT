@@ -162,10 +162,11 @@
     position:fixed; inset:0; background:rgba(15,17,24,.5); display:none; align-items:center; justify-content:center; z-index:80;
   }
   .modal-overlay.show{display:flex;}
-  .modal{background:#fff; border-radius:16px; width:640px; max-width:92vw; padding:26px 26px 22px; box-shadow:0 30px 70px -20px rgba(0,0,0,.4);}
+  .modal{background:#fff; border-radius:16px; width:860px; max-width:94vw; padding:26px 26px 22px; box-shadow:0 30px 70px -20px rgba(0,0,0,.4);}
   .modal h2{font-family:"Archivo",sans-serif; font-weight:700; font-size:17px; margin-bottom:4px;}
   .modal p.sub{color:var(--erp-muted); font-size:12.5px; margin-bottom:18px;}
-  .modal-options{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .modal-options{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:720px){ .modal-options{grid-template-columns:1fr;} }
   .modal-opt{
     border:1.5px solid var(--erp-border); border-radius:12px; padding:16px; cursor:pointer; text-align:left;
     background:#fff; transition:border-color .12s, background .12s;
@@ -192,7 +193,8 @@
   .field{margin-bottom:12px;}
   .field label{display:block; font-size:12.5px; font-weight:600; color:var(--erp-ink); margin-bottom:5px;}
   .field .hint{font-size:11.5px; color:var(--erp-muted); margin-top:4px; line-height:1.5;}
-  .field input[type=text], .field input[type=number], .field input[type=date], .field textarea{
+  .field input[type=text], .field input[type=number], .field input[type=date], .field textarea,
+  .dyn-row input[type=text], .dyn-row input[type=number]{
     width:100%; border:1px solid var(--erp-border); background:var(--erp-bg); color:var(--erp-ink);
     border-radius:var(--radius-sm); padding:8px 10px; font-size:13px; font-family:inherit;
     transition:border-color .12s, box-shadow .12s;
@@ -202,8 +204,8 @@
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
   .prefix-field{position:relative;} .prefix-field span{position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12.5px; color:var(--erp-muted); pointer-events:none;}
-  .field .prefix-field input{padding-left:34px !important;}
-  .field .suffix-field input{padding-right:28px !important;}
+  .field .prefix-field input, .dyn-row3 .prefix-field input{padding-left:34px !important;}
+  .field .suffix-field input, .dyn-row3 .suffix-field input{padding-right:28px !important;}
   .suffix-field{position:relative;} .suffix-field span{position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:12.5px; color:var(--erp-muted); pointer-events:none;}
 
   .dyn-list{display:flex; flex-direction:column; gap:8px; margin-bottom:10px;}
@@ -341,9 +343,11 @@
   .tna-box{border:1px solid var(--doc2-border); border-radius:10px; padding:14px 18px; background:#fff;}
   .tna-head{display:flex; justify-content:space-between; align-items:baseline; font-family:"Archivo",sans-serif; font-weight:700; font-size:12.5px; color:var(--doc2-ink); margin-bottom:8px; border-bottom:1px solid var(--doc2-border); padding-bottom:8px;}
   .tna-head-r{font-size:10.5px; color:var(--doc2-teal); text-transform:uppercase; letter-spacing:.03em;}
-  .tna-row{display:flex; align-items:center; gap:8px; padding:6px 0; font-size:11.5px;}
-  .tna-label{color:var(--doc2-muted);} .tna-dot{color:var(--doc2-steel);}
-  .tna-val{margin-left:auto; font-family:"Archivo",sans-serif; font-weight:800; font-size:15px; color:var(--doc2-teal);}
+  .tna-row{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 0; font-size:11.5px; flex-wrap:nowrap;}
+  .tna-label{color:var(--doc2-muted); flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .tna-label b{white-space:nowrap;}
+  .tna-dot{color:var(--doc2-steel); flex:none;}
+  .tna-val{flex:none; margin-left:auto; font-family:"Archivo",sans-serif; font-weight:800; font-size:15px; color:var(--doc2-teal); white-space:nowrap;}
   .cards-row{display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:1fr; align-items:stretch; gap:14px; padding:0 40px 18px;}
   .op-card{border-radius:8px; overflow:hidden; display:flex; flex-direction:column; height:100%;}
   .op-card-head{padding:14px 8px 12px; text-align:center; min-height:98px; flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center;}
@@ -531,6 +535,7 @@
             <fieldset>
               <legend>Operación</legend>
               <div class="field"><label for="cr-operacion">Nombre de la operación</label><input type="text" id="cr-operacion" name="operacion" placeholder="Ej: Edificio Lavalle 796, CABA (Primer Desembolso)" /></div>
+              <div class="field"><label for="cr-nombreInterno">Nombre en el listado (opcional)</label><input type="text" id="cr-nombreInterno" name="nombreInterno" placeholder="Si lo dejás vacío, se usa el nombre de la operación" /></div>
               <div class="field"><label for="cr-fecha">Fecha estimada de la inversión</label><input type="date" id="cr-fecha" name="fechaEstimada" /></div>
             </fieldset>
             <fieldset>
@@ -540,11 +545,15 @@
             </fieldset>
             <fieldset>
               <legend>Garantía y condiciones</legend>
-              <div class="field"><label for="cr-tasacion">Tasación de la garantía</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-tasacion" name="tasacionGarantia" /></div></div>
               <div class="row2">
-                <div class="field"><label for="cr-desembolso">Primer desembolso</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-desembolso" name="primerDesembolso" /></div></div>
-                <div class="field"><label for="cr-linea">Línea de crédito total</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-linea" name="lineaCreditoTotal" /></div><div class="hint">Vacío = desembolso único.</div></div>
+                <div class="field"><label for="cr-tasacion">Tasación de la garantía (valor actual)</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-tasacion" name="tasacionGarantia" /></div></div>
+                <div class="field"><label for="cr-tasacionProyectada">Tasación proyectada (opcional)</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-tasacionProyectada" name="tasacionProyectada" /></div><div class="hint">Vacío = se muestra un solo valor de tasación.</div></div>
               </div>
+              <div class="row2">
+                <div class="field"><label for="cr-desembolsoLabel">Etiqueta del desembolso</label><input type="text" id="cr-desembolsoLabel" name="primerDesembolsoLabel" placeholder="Ej: Primer Desembolso / Décimo Primer Desembolso" /></div>
+                <div class="field"><label for="cr-desembolso">Monto del desembolso</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-desembolso" name="primerDesembolso" /></div></div>
+              </div>
+              <div class="field"><label for="cr-linea">Línea de crédito total</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-linea" name="lineaCreditoTotal" /></div><div class="hint">Vacío = desembolso único.</div></div>
               <div class="row2">
                 <div class="field"><label for="cr-plazo">Plazo de la inversión (meses)</label><input type="number" min="0" step="1" id="cr-plazo" name="plazoMeses" /></div>
                 <div class="field"><label for="cr-inversionMinima">Inversión mínima</label><div class="prefix-field"><span>US$</span><input type="number" min="0" step="1000" id="cr-inversionMinima" name="inversionMinima" /></div></div>
@@ -566,6 +575,7 @@
             <fieldset>
               <legend>Detalles de la garantía</legend>
               <div class="field"><label for="cr-garantiaInfo">Información de la garantía</label><textarea id="cr-garantiaInfo" name="garantiaInfo"></textarea></div>
+              <div class="field"><label for="cr-garantiaInfoExtra">Texto adicional después de la tasación (opcional)</label><textarea id="cr-garantiaInfoExtra" name="garantiaInfoExtra" placeholder="Ej: los desembolsos se irán realizando a medida que avance la obra..."></textarea></div>
               <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:5px;">Formato de la garantía (bullets)</label>
               <div class="dyn-list" id="crFormatoGarRows"></div>
               <button type="button" class="btn btn-ghost btn-small" id="crAddFormatoGar">+ Agregar ítem</button>
@@ -606,6 +616,11 @@
         <div class="modal-opt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.2 3.4 9.4 8 11 4.6-1.6 8-5.8 8-11V5l-8-3Z"/><path d="M9 12l2 2 4-4"/></svg></div>
         <h3>Crédito con garantía</h3>
         <p>Préstamo privado a tasa fija (TNA escalonada) con inmuebles en garantía vía fideicomiso.</p>
+      </button>
+      <button class="modal-opt" type="button" id="optCreditoII">
+        <div class="modal-opt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.2 3.4 9.4 8 11 4.6-1.6 8-5.8 8-11V5l-8-3Z"/><path d="M9 12l2 2 4-4"/><path d="M12 2v20" stroke-dasharray="1 3"/></svg></div>
+        <h3>Crédito con Garantía II</h3>
+        <p>Igual al anterior, pero con tasación actual/proyectada y desembolsos progresivos (como Shale, Vaca Muerta).</p>
       </button>
     </div>
     <div class="modal-foot"><button class="btn" type="button" id="btnCancelModal">Cancelar</button></div>
@@ -1063,14 +1078,14 @@
   ============================================================ */
   var Credito = (function(){
     var BLANK = {
-      operacion:'', fechaEstimada:'',
+      operacion:'', nombreInterno:'', fechaEstimada:'',
       tipoInversionBullets:['Colocación de dólares a tasa fija.','Inversión en préstamo privado.','Inmuebles en garantía.'],
-      tasacionGarantia:'', primerDesembolso:'', lineaCreditoTotal:'',
+      tasacionGarantia:'', tasacionProyectada:'', primerDesembolsoLabel:'Primer Desembolso', primerDesembolso:'', lineaCreditoTotal:'',
       plazoMeses:'', inversionMinima:'',
       tipoGarantia:'Fideicomiso', moneda:'Dólares (billete)',
       amortizacionTitulo:'Americano', amortizacionSub:'(paga intereses mensuales y el capital al vencimiento)',
       tasas:[{desde:25000,tna:''},{desde:50000,tna:''},{desde:100000,tna:''}],
-      garantiaInfo:'',
+      garantiaInfo:'', garantiaInfoExtra:'',
       formatoGarantia:['Fideicomiso en garantía.','Transferencia de dominio de las propiedades por escritura pública.'],
       faqs:[
         {q:'¿Por qué es confiable esta inversión?', a:'El tomador del crédito aporta los inmuebles en garantía, los cuales son escriturados a nombre de nuestra empresa fiduciaria. En caso de que el tomador incumpliera en sus compromisos, la fiduciaria está facultada a realizar la venta de los inmuebles para pagarle a los inversores.'},
@@ -1085,6 +1100,16 @@
       plazoMeses:36, inversionMinima:25000,
       tasas:[{desde:25000,tna:10},{desde:50000,tna:11},{desde:100000,tna:12}],
       garantiaInfo:'Edificio de 3.700 m² cubiertos ubicado en la esquina de Lavalle y Esmeralda. Cuenta con 7 plantas de oficinas de entre 300 m² y 450 m², locales comerciales en Planta Baja y depósitos en el subsuelo.\n\nSe encuentra en el epicentro del Microcentro porteño, a 2 cuadras del obelisco, 1 cuadra de Av. Corrientes y a 6 cuadras de Av. Paseo Colón con acceso inmediato a los principales accesos, estaciones de subte y líneas colectivos lo que garantiza una excelente conectividad con toda la Ciudad de Buenos Aires y la Provincia.',
+      montoSimulado:100000
+    });
+    var EXAMPLE_2 = Object.assign({}, BLANK, {
+      operacion:'Shale, Vaca Muerta (Décimo Primer Desembolso)', nombreInterno:'Crédito con Garantía II', fechaEstimada:'2026-08-24',
+      tasacionGarantia:5500000, tasacionProyectada:8000000,
+      primerDesembolsoLabel:'Décimo Primer Desembolso', primerDesembolso:150000, lineaCreditoTotal:3000000,
+      plazoMeses:24, inversionMinima:25000,
+      tasas:[{desde:25000,tna:10},{desde:50000,tna:11},{desde:100000,tna:12}],
+      garantiaInfo:'3 Módulos de departamentos de 307 m² cubiertos y 100 m² semi-cubiertos totales, sobre un lote de 360 m², 2 Módulos de departamentos con un grado de avance del 90% y 3 terrenos aptos multifamiliar de 360 m² para replicar edificios con departamentos ubicados en zona estratégica de Añelo (Vaca Muerta).',
+      garantiaInfoExtra:'Los desembolsos del crédito se irán realizando a medida que avance la obra, manteniendo siempre un límite de aforo del 50% del valor del inmueble.',
       montoSimulado:100000
     });
 
@@ -1172,9 +1197,16 @@
       var tasasSorted = d.tasas.slice().sort(function(a,b){ return n(a.desde)-n(b.desde); });
       var tasasRowsHTML = tasasSorted.map(function(t){ return '<div class="tna-row"><span class="tna-label">Invirtiendo desde <b>'+fmtUSD(t.desde)+'</b></span><span class="tna-dot">•</span><span class="tna-val">'+fmtPct(t.tna,2)+'</span></div>'; }).join('') || '<div class="tna-row"><span class="tna-label">Cargá los tramos de tasa a la izquierda.</span></div>';
       var bulletsInv = d.tipoInversionBullets.filter(function(b){return b.trim();}).map(function(b){ return '<li>'+esc(b)+'</li>'; }).join('');
+      var desembolsoLabel = d.primerDesembolsoLabel || 'Primer Desembolso';
       var montoCreditoHTML = n(d.lineaCreditoTotal) > 0
-        ? '<div class="card-val-strong">Primer Desembolso:<br>'+fmtUSD(d.primerDesembolso)+'</div><div class="card-sub">Línea de Crédito Total: '+fmtUSD(d.lineaCreditoTotal)+'</div>'
+        ? '<div class="card-val-strong">'+esc(desembolsoLabel)+':<br>'+fmtUSD(d.primerDesembolso)+'</div><div class="card-sub">Línea de Crédito Total: '+fmtUSD(d.lineaCreditoTotal)+'</div>'
         : '<div class="card-val-strong">'+fmtUSD(d.primerDesembolso)+'</div>';
+      var tasacionCardHTML = n(d.tasacionProyectada) > 0
+        ? '<div class="card-val-strong">Valor Actual: '+fmtUSD(d.tasacionGarantia)+'</div><div class="card-sub">(Valor proyectado: '+fmtUSD(d.tasacionProyectada)+')</div>'
+        : '<div class="card-val-strong">'+fmtUSD(d.tasacionGarantia)+'</div>';
+      var tasacionDetailHTML = n(d.tasacionProyectada) > 0
+        ? '<div class="tasacion-actual">Tasación Actual: '+fmtUSD(d.tasacionGarantia)+'</div><div class="tasacion-actual">Tasación Proyectada: '+fmtUSD(d.tasacionProyectada)+'</div>'
+        : '<div class="tasacion-actual">Tasación Actual: '+fmtUSD(d.tasacionGarantia)+'</div>';
       var formatoGarRows = d.formatoGarantia.filter(function(b){return b.trim();}).map(function(b){ return '<li>'+esc(b)+'</li>'; }).join('');
       var faqsHTML = d.faqs.map(function(f){ return '<div class="faq-item"><div class="faq-dot"></div><div class="faq-body"><div class="faq-q">'+esc(f.q)+'</div><div class="faq-a">'+esc(f.a)+'</div></div></div>'; }).join('');
 
@@ -1184,7 +1216,7 @@
         + '<div class="doc-top-row"><div class="op-box"><div class="op-box-title">Operación: '+esc(d.operacion||'Nombre de la operación')+'</div><div class="op-box-sub">Tipo de inversión:</div><ul class="op-bullets">'+bulletsInv+'</ul></div>'
         + '<div class="tna-box"><div class="tna-head"><span>Rendimiento del Dinero</span><span class="tna-head-r">Tasa Anual (TNA)</span></div>'+tasasRowsHTML+'</div></div>'
         + '<div class="cards-row cards-olive">'
-        +   card('Tasación de la Garantía', '<div class="card-val-strong">'+fmtUSD(d.tasacionGarantia)+'</div>')
+        +   card('Tasación de la Garantía', tasacionCardHTML)
         +   card('Monto Del Crédito Otorgado Al Tomador', montoCreditoHTML)
         +   card('Plazo de la Inversión', '<div class="card-val-strong">'+(n(d.plazoMeses)||0)+' Meses</div>')
         +   card('Inversión Mínima', '<div class="card-val-strong">'+fmtUSD(d.inversionMinima)+'</div>')
@@ -1197,7 +1229,7 @@
         + '</div>'
         + '<div class="doc-h2">Detalles de la Garantía</div>'
         + '<div class="detail-table">'
-        +   '<div class="detail-row"><div class="detail-label olive">Información de la Garantía</div><div class="detail-content">'+nl2p(d.garantiaInfo)+'<div class="tasacion-actual">Tasación Actual: '+fmtUSD(d.tasacionGarantia)+'</div></div></div>'
+        +   '<div class="detail-row"><div class="detail-label olive">Información de la Garantía</div><div class="detail-content">'+nl2p(d.garantiaInfo)+tasacionDetailHTML+nl2p(d.garantiaInfoExtra)+'</div></div>'
         +   '<div class="detail-row"><div class="detail-label steel">Formato de la Garantía</div><div class="detail-content"><ul class="plain-bullets">'+formatoGarRows+'</ul></div></div>'
         +   '<div class="detail-row"><div class="detail-label steel">Fecha Estimada de la Inversión</div><div class="detail-content">'+esc(fmtFecha(d.fechaEstimada))+'.</div></div>'
         + '</div>'
@@ -1254,10 +1286,10 @@
       render();
     }
     function getSnapshot(){ return {data: state}; }
-    function displayName(){ return state.operacion || 'Ficha sin título'; }
+    function displayName(){ return state.nombreInterno || state.operacion || 'Ficha sin título'; }
 
     function buildWhatsappText(driveLink){
-      var nombre = displayName();
+      var nombre = state.operacion || displayName();
       var tnas = state.tasas.map(function(t){ return n(t.tna); }).filter(function(v){ return v > 0; });
       var tnaMin = tnas.length ? Math.min.apply(null, tnas) : 0;
       var tnaMax = tnas.length ? Math.max.apply(null, tnas) : 0;
@@ -1274,7 +1306,7 @@
         + 'Saludos!';
     }
 
-    return {BLANK:BLANK, EXAMPLE:EXAMPLE, mount:mount, getSnapshot:getSnapshot, displayName:displayName, buildWhatsappText:buildWhatsappText};
+    return {BLANK:BLANK, EXAMPLE:EXAMPLE, EXAMPLE_2:EXAMPLE_2, mount:mount, getSnapshot:getSnapshot, displayName:displayName, buildWhatsappText:buildWhatsappText};
   })();
 
   /* ============================================================
@@ -1358,10 +1390,20 @@
     }
   }
 
-  function newFicha(tipo){
+  function newFicha(tipo, presetKey){
+    var baseData;
+    if(tipo === 'canje'){
+      baseData = Object.assign({}, Canje.BLANK);
+    } else if(presetKey === 'credito2'){
+      baseData = JSON.parse(JSON.stringify(Credito.EXAMPLE_2));
+    } else {
+      baseData = Object.assign({}, Credito.BLANK);
+    }
     var f = {
-      id: uid(), tipo: tipo, nombre: 'Ficha sin título', updatedAt: Date.now(),
-      data: tipo === 'canje' ? Object.assign({}, Canje.BLANK) : Object.assign({}, Credito.BLANK),
+      id: uid(), tipo: tipo,
+      nombre: presetKey === 'credito2' ? 'Crédito con Garantía II' : 'Ficha sin título',
+      updatedAt: Date.now(),
+      data: baseData,
       hero: null, logo: null
     };
     DB.fichas.push(f);
@@ -1380,6 +1422,7 @@
     document.getElementById('modalNueva').addEventListener('click', function(e){ if(e.target.id === 'modalNueva') document.getElementById('modalNueva').classList.remove('show'); });
     document.getElementById('optCanje').addEventListener('click', function(){ newFicha('canje'); });
     document.getElementById('optCredito').addEventListener('click', function(){ newFicha('credito'); });
+    document.getElementById('optCreditoII').addEventListener('click', function(){ newFicha('credito', 'credito2'); });
 
     document.getElementById('fichasBody').addEventListener('click', function(e){
       var btn = e.target.closest('[data-action]');
