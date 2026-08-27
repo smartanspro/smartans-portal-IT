@@ -63,7 +63,14 @@ function handleUploadPdf(datos) {
 
     var folder = DriveApp.getFolderById(FOLDER_ID);
     var file = folder.createFile(blob);
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    try {
+      // la carpeta destino ya está compartida como "cualquiera con el link" — los
+      // archivos nuevos heredan ese acceso. Si el dominio (Workspace) bloquea compartir
+      // fuera de la organización, esta llamada falla — no debe tumbar toda la subida.
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (shareErr) {
+      // seguimos igual: el archivo ya se creó y hereda el permiso de la carpeta
+    }
 
     var link = 'https://drive.google.com/file/d/' + file.getId() + '/view?usp=sharing';
     return jsonOut({ ok: true, link: link, id: file.getId() });
