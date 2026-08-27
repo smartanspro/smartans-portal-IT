@@ -845,7 +845,7 @@
      la cuenta que lo desplegó, y acepta el POST de cualquier origen.
      Ver README para los pasos de creación del Apps Script.
   ============================================================ */
-  var APPS_SCRIPT_URL = 'PEGAR_TU_URL_DE_APPS_SCRIPT_AQUI';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzmLfHoEnsn0hw_-v9TSD30G7PU3Un9NSGmKoapPswoAL1JDO46EzJhMXDZ1pKmQV-e/exec';
 
   function appsScriptConfigured(){
     return !!APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PEGAR_TU_URL') !== 0;
@@ -871,8 +871,10 @@
         if(!r.ok) return r.text().then(function(t){ throw new Error('Apps Script respondió ' + r.status + ': ' + t); });
         return r.json();
       }).then(function(data){
-        if(!data.ok) throw new Error(data.error || 'Apps Script devolvió un error al subir el archivo.');
-        return data.link;
+        /* acepta tanto {ok,link} (Code.gs de referencia) como {status,url} (variantes propias del script) */
+        var success = data.ok === true || data.status === true;
+        if(!success) throw new Error(data.error || data.message || 'Apps Script devolvió un error al subir el archivo.');
+        return data.link || data.url;
       });
     });
   }
