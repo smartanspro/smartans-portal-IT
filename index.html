@@ -1190,12 +1190,12 @@
       var linkBlock = driveLink
         ? ('Más información en el siguiente link:\n' + driveLink + '\n\n')
         : 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n';
-      return 'Hola a todos.\n\n'
+      return '¡Hola a todos!\n\n'
         + 'Les paso la ficha de la próxima oportunidad de inversión denominada: *' + nombre + '*.\n\n'
         + 'Tipo de inversión: Compra de terreno y posterior canje por departamentos.\n\n'
-        + '🔹 Invertís en la compra del terreno.\n'
-        + '🔹 Obtenés metros cuadrados de pozo al mejor valor (rango estimado ' + fmtUSD(c.costoM2Min) + '/m2 - ' + fmtUSD(c.costoM2Max) + '/m2).\n'
-        + '🔹 Rentabilidad estimada contra precio de venta (rango estimado ' + fmtPct(c.rentMin,1) + ' - ' + fmtPct(c.rentMax,1) + ').\n\n'
+        + '🟢 Invertís en la compra del terreno.\n'
+        + '🟢 Obtenés metros cuadrados de pozo al mejor valor (rango estimado ' + fmtUSD(c.costoM2Min) + '/m2 - ' + fmtUSD(c.costoM2Max) + '/m2).\n'
+        + '🟢 Rentabilidad estimada contra precio de venta (rango estimado ' + fmtPct(c.rentMin,1) + ' - ' + fmtPct(c.rentMax,1) + ').\n\n'
         + linkBlock
         + 'Cualquier duda me consultan.\n'
         + 'Saludos!';
@@ -1427,11 +1427,11 @@
       var linkBlock = driveLink
         ? ('Más información en el siguiente link:\n' + driveLink + '\n\n')
         : 'Te paso el PDF con toda la información (te lo adjunto a continuación).\n\n';
-      return 'Hola a todos.\n\n'
+      return '¡Hola a todos!\n\n'
         + 'Les paso la ficha de la próxima operación de inversión denominada: "' + nombre + '".\n\n'
-        + '🔹 Moneda: ' + (state.moneda || '') + '.\n'
-        + '🔹 Inversión Mínima: ' + fmtUSD(state.inversionMinima) + '.-\n'
-        + '🔹 Tasa anual (TNA fija): entre ' + fmtPct(tnaMin,2) + ' y ' + fmtPct(tnaMax,2) + ' (según monto de inversión).\n\n'
+        + '🟢 Moneda: ' + (state.moneda || '') + '.\n'
+        + '🟢 Inversión Mínima: ' + fmtUSD(state.inversionMinima) + '.-\n'
+        + '🟢 Tasa anual (TNA fija): entre ' + fmtPct(tnaMin,2) + ' y ' + fmtPct(tnaMax,2) + ' (según monto de inversión).\n\n'
         + linkBlock
         + 'Cualquier duda me consultan.\n'
         + 'Saludos!';
