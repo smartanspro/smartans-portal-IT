@@ -142,7 +142,7 @@
   table.fichas tr:last-child td{border-bottom:none;}
   table.fichas tr:hover td{background:#fafafd;}
   .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:8px;}
-  .dot.g{background:#22c55e;} .dot.y{background:#eab308;}
+  .dot.g{background:#22c55e;} .dot.y{background:#eab308;} .dot.r{background:#ef4444;}
   .row-name{font-weight:700; color:var(--erp-ink);}
   .tag{display:inline-flex; align-items:center; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700;}
   .tag.canje{background:#eef2ff; color:#4338ca;}
@@ -156,6 +156,28 @@
   .icon-btn svg{width:14px; height:14px;}
   .icon-btn.danger:hover{background:var(--danger-soft); color:var(--danger); border-color:var(--danger-soft);}
   .empty-state{padding:60px 20px; text-align:center; color:var(--erp-muted); font-size:13px;}
+
+  /* ============ MÓDULOS PLACEHOLDER (RPA / Agentes / Monitoreo / Notificaciones) ============ */
+  .module-placeholder{max-width:520px; margin:70px auto; text-align:center; padding:44px 30px; background:var(--erp-panel); border:1px solid var(--erp-border); border-radius:var(--radius); box-shadow:var(--shadow);}
+  .module-placeholder-ic{width:60px; height:60px; border-radius:16px; background:var(--erp-accent-soft); color:var(--erp-accent); display:flex; align-items:center; justify-content:center; margin:0 auto 20px;}
+  .module-placeholder-ic svg{width:28px; height:28px;}
+  .module-placeholder h1{font-family:"Archivo",sans-serif; font-weight:700; font-size:19px; margin-bottom:10px;}
+  .module-placeholder p{color:var(--erp-muted); font-size:13.5px; line-height:1.6; margin-bottom:20px;}
+  .badge-soon{display:inline-flex; align-items:center; gap:6px; background:var(--erp-bg); border:1px solid var(--erp-border); border-radius:20px; padding:6px 14px; font-size:11px; font-weight:700; color:var(--erp-muted); letter-spacing:.04em; text-transform:uppercase;}
+
+  /* ============ NOTIFICACIONES ============ */
+  .notif-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; align-items:start;}
+  .notif-card{padding:20px;}
+  .notif-card-head{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .notif-ic{width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; color:#fff; flex:none;}
+  .notif-ic svg{width:17px; height:17px;}
+  .notif-ic.slack{background:#4A154B;}
+  .notif-ic.telegram{background:#229ED9;}
+  .notif-ic.email{background:#ea4335;}
+  .notif-card-head h3{font-family:"Archivo",sans-serif; font-weight:700; font-size:15px;}
+  .notif-status{font-size:12px; margin-top:9px; min-height:15px; color:var(--erp-muted);}
+  .notif-status.ok{color:#16794f; font-weight:600;}
+  .notif-status.err{color:var(--danger); font-weight:600;}
 
   /* ============ MODAL "nueva ficha" ============ */
   .modal-overlay{
@@ -393,12 +415,16 @@
     <div class="login-logo">
       <img id="loginLogoImg" alt="SMARTANS" />
     </div>
-    <h2>Fichas de Inversión</h2>
+    <h2>Portal de Operaciones</h2>
     <p class="sub">Ingresá con tu usuario de Smartans para continuar.</p>
     <form id="loginForm" autocomplete="off">
       <div class="login-error" id="loginError">Usuario o contraseña incorrectos.</div>
       <div class="login-field"><label for="loginUser">Usuario</label><input type="text" id="loginUser" autocomplete="username" /></div>
       <div class="login-field"><label for="loginPass">Contraseña</label><input type="password" id="loginPass" autocomplete="current-password" /></div>
+      <div class="login-field login-captcha">
+        <label id="captchaLabel" for="loginCaptcha">Verificación: ¿cuánto es 3 + 4?</label>
+        <input type="text" id="loginCaptcha" inputmode="numeric" autocomplete="off" placeholder="Escribí el resultado" />
+      </div>
       <button class="btn btn-primary btn-login" type="submit">Ingresar</button>
     </form>
   </div>
@@ -411,7 +437,13 @@
     </div>
     <nav class="sidebar-nav">
       <button class="side-item active" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3.5" width="10" height="17" rx="1.6"/><path d="M9.4 8h1.6M13 8h1.6M9.4 12h1.6M13 12h1.6M9.4 16h1.6M13 16h1.6"/></svg> Operaciones</button>
-      <div class="side-sub"><button class="side-sub-item active" type="button" id="navFichas">Fichas de Inversión</button></div>
+      <div class="side-sub">
+        <button class="side-sub-item active" type="button" id="navFichas">Fichas de Inversión</button>
+        <button class="side-sub-item" type="button" id="navRPA">RPA</button>
+        <button class="side-sub-item" type="button" id="navAgentes">Agentes</button>
+        <button class="side-sub-item" type="button" id="navMonitoreo">Monitoreo</button>
+        <button class="side-sub-item" type="button" id="navNotificaciones">Notificaciones</button>
+      </div>
     </nav>
     <div class="sidebar-foot">
       <button class="side-item" type="button" id="btnLogout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3.5H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h9"/><path d="M11 12h10M17.5 8.5 21 12l-3.5 3.5"/></svg> Cerrar sesión</button>
@@ -596,6 +628,96 @@
           <div class="previewbar"><div class="previewbar-info">Vista previa en vivo</div><div style="display:flex;gap:8px;"><button class="btn btn-whatsapp" id="crBtnWhatsapp" type="button">📱 Enviar por WhatsApp</button><button class="btn btn-primary" id="crBtnExport" type="button">⬇ Descargar PDF</button></div></div>
           <div class="previewstage"><div class="stage"><div id="previewCredito"></div></div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ================= VISTA: RPA (placeholder) ================= -->
+    <div class="content" id="viewRPA" style="display:none;">
+      <div class="module-placeholder">
+        <div class="module-placeholder-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/><circle cx="9" cy="14" r="1.2"/><circle cx="15" cy="14" r="1.2"/><path d="M4 13H2M22 13h-2"/></svg></div>
+        <h1>RPA</h1>
+        <p>Acá vas a poder ver y gestionar los procesos de automatización robótica (bots) que corren sobre tus sistemas: estado, últimas ejecuciones y errores.</p>
+        <span class="badge-soon">Módulo en construcción</span>
+      </div>
+    </div>
+
+    <!-- ================= VISTA: AGENTES (placeholder) ================= -->
+    <div class="content" id="viewAgentes" style="display:none;">
+      <div class="module-placeholder">
+        <div class="module-placeholder-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="13" rx="2.5"/><circle cx="8.5" cy="11.5" r="1.3"/><circle cx="15.5" cy="11.5" r="1.3"/><path d="M12 5V2.5M9 2.5h6"/></svg></div>
+        <h1>Agentes</h1>
+        <p>Panel de los agentes automatizados (IA) que operan sobre tus procesos: qué tareas tienen asignadas, su estado y su historial de acciones.</p>
+        <span class="badge-soon">Módulo en construcción</span>
+      </div>
+    </div>
+
+    <!-- ================= VISTA: MONITOREO (placeholder) ================= -->
+    <div class="content" id="viewMonitoreo" style="display:none;">
+      <div class="page-head">
+        <div>
+          <h1>Monitoreo</h1>
+          <p>Chequeo HTTP automático de las URLs/APIs que agregues, cada 30 segundos mientras esta pestaña esté abierta. Al detectar una caída (o una recuperación) avisa por Slack/Telegram si los tenés configurados en Notificaciones.</p>
+        </div>
+      </div>
+
+      <div class="panel" style="padding:16px 18px; margin-bottom:16px;">
+        <div class="row2" style="align-items:end;">
+          <div class="field" style="margin-bottom:0;"><label for="monName">Nombre del servicio</label><input type="text" id="monName" placeholder="Ej: API Facturación" /></div>
+          <div class="field" style="margin-bottom:0;"><label for="monUrl">URL a chequear</label><input type="text" id="monUrl" placeholder="https://api.miservicio.com/health" /></div>
+        </div>
+        <button class="btn btn-primary" type="button" id="monAdd" style="margin-top:12px;">+ Agregar servicio</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-toolbar">
+          <span style="font-size:12.5px; color:var(--erp-muted);" id="monIntervalInfo">Chequeo automático cada 30s.</span>
+          <button class="btn btn-small" type="button" id="monCheckAll">↻ Verificar todos ahora</button>
+        </div>
+        <table class="fichas">
+          <thead><tr><th>Servicio</th><th>Estado</th><th>Latencia</th><th>Última verificación</th><th></th></tr></thead>
+          <tbody id="monBody"></tbody>
+        </table>
+        <div class="empty-state" id="monEmpty" style="display:none;">Todavía no agregaste ningún servicio a monitorear.</div>
+      </div>
+    </div>
+
+    <!-- ================= VISTA: NOTIFICACIONES (placeholder) ================= -->
+    <div class="content" id="viewNotificaciones" style="display:none;">
+      <div class="page-head">
+        <div>
+          <h1>Notificaciones</h1>
+          <p>Configurá los canales por donde recibís avisos del portal, y probá el envío real de cada uno.</p>
+        </div>
+      </div>
+      <div class="notif-grid">
+
+        <div class="panel notif-card">
+          <div class="notif-card-head"><div class="notif-ic slack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg></div><h3>Slack</h3></div>
+          <div class="field"><label for="notifSlackWebhook">Webhook URL</label><input type="text" id="notifSlackWebhook" placeholder="https://hooks.slack.com/services/..." /><div class="hint">Slack → tu workspace → Apps → Incoming Webhooks → creá uno para el canal que quieras.</div></div>
+          <div class="field"><label for="notifSlackMsg">Mensaje de prueba</label><textarea id="notifSlackMsg">Prueba desde el Portal de Operaciones ✅</textarea></div>
+          <button class="btn btn-primary" type="button" id="notifSlackTest">Enviar prueba a Slack</button>
+          <div class="notif-status" id="notifSlackStatus"></div>
+        </div>
+
+        <div class="panel notif-card">
+          <div class="notif-card-head"><div class="notif-ic telegram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4 3 11.5l6 2.3M21 4l-3.2 16-6.8-5.2M21 4 9.8 13.8v5.7"/></svg></div><h3>Telegram</h3></div>
+          <div class="field"><label for="notifTelegramToken">Bot Token</label><input type="text" id="notifTelegramToken" placeholder="123456789:AAExxxxxxxxxxxxxxxxxxxxxxxxxxxxx" /><div class="hint">Creá un bot con @BotFather y pegá el token que te da.</div></div>
+          <div class="field"><label for="notifTelegramChat">Chat ID</label><input type="text" id="notifTelegramChat" placeholder="Ej: 123456789 o -1001234567890" /><div class="hint">Escribile al bot y consultá tu chat_id con @userinfobot, o agregalo a un grupo.</div></div>
+          <div class="field"><label for="notifTelegramMsg">Mensaje de prueba</label><textarea id="notifTelegramMsg">Prueba desde el Portal de Operaciones ✅</textarea></div>
+          <button class="btn btn-primary" type="button" id="notifTelegramTest">Enviar prueba a Telegram</button>
+          <div class="notif-status" id="notifTelegramStatus"></div>
+        </div>
+
+        <div class="panel notif-card">
+          <div class="notif-card-head"><div class="notif-ic email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M3 6.5l9 6.2 9-6.2"/></svg></div><h3>Email</h3></div>
+          <div class="field"><label for="notifEmailTo">Email destino</label><input type="text" id="notifEmailTo" placeholder="alguien@smartans.pro" /></div>
+          <div class="field"><label for="notifEmailSubject">Asunto</label><input type="text" id="notifEmailSubject" placeholder="Notificación del Portal de Operaciones" /></div>
+          <div class="field"><label for="notifEmailBody">Mensaje</label><textarea id="notifEmailBody">Mensaje de prueba desde el Portal de Operaciones.</textarea></div>
+          <button class="btn" type="button" id="notifEmailTest">Abrir en cliente de correo</button>
+          <div class="hint">No envía automático: abre tu programa de correo con todo precargado — vos apretás enviar. Enviar un email real sin intervención tuya requeriría un servicio externo (ej. EmailJS).</div>
+          <div class="notif-status" id="notifEmailStatus"></div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -1360,11 +1482,19 @@
     }).join('');
   }
 
+  var VIEW_MAP = {
+    list:'viewList', canje:'viewCanje', credito:'viewCredito',
+    rpa:'viewRPA', agentes:'viewAgentes', monitoreo:'viewMonitoreo', notificaciones:'viewNotificaciones'
+  };
+  var NAV_MAP = {list:'navFichas', rpa:'navRPA', agentes:'navAgentes', monitoreo:'navMonitoreo', notificaciones:'navNotificaciones'};
   function showView(name){
-    document.getElementById('viewList').style.display = name === 'list' ? '' : 'none';
-    document.getElementById('viewCanje').style.display = name === 'canje' ? '' : 'none';
-    document.getElementById('viewCredito').style.display = name === 'credito' ? '' : 'none';
-    document.getElementById('btnBack').style.display = name === 'list' ? 'none' : '';
+    Object.keys(VIEW_MAP).forEach(function(key){
+      document.getElementById(VIEW_MAP[key]).style.display = (key === name) ? '' : 'none';
+    });
+    document.getElementById('btnBack').style.display = (name === 'canje' || name === 'credito') ? '' : 'none';
+    document.querySelectorAll('.side-sub-item').forEach(function(btn){ btn.classList.remove('active'); });
+    var activeNavId = NAV_MAP[name] || ((name === 'canje' || name === 'credito') ? 'navFichas' : null);
+    if(activeNavId){ var el = document.getElementById(activeNavId); if(el) el.classList.add('active'); }
   }
 
   function openFicha(id){
@@ -1412,8 +1542,210 @@
     openFicha(f.id);
   }
 
+  /* ============================================================
+     NOTIFICACIONES — Slack (webhook) + Telegram (Bot API) + Email (mailto)
+  ============================================================ */
+  var NOTIF_KEY = 'smartans_portal_notif_v1';
+  function loadNotifConfig(){ try{ return JSON.parse(localStorage.getItem(NOTIF_KEY)) || {}; }catch(e){ return {}; } }
+  function saveNotifConfig(cfg){ try{ localStorage.setItem(NOTIF_KEY, JSON.stringify(cfg)); }catch(e){} }
+
+  function sendSlackWebhook(url, msg){
+    return fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: msg})});
+  }
+  function sendTelegramMessage(token, chat, msg){
+    return fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({chat_id: chat, text: msg})
+    }).then(function(r){ return r.json(); }).then(function(data){
+      if(!data.ok) throw new Error(data.description || 'Telegram rechazó el envío.');
+      return data;
+    });
+  }
+  /* dispara la alerta a todos los canales configurados; nunca rechaza (cada canal falla en silencio si no está configurado o da error) */
+  function notifyAllChannels(msg){
+    var cfg = loadNotifConfig();
+    if(cfg.slackWebhook) sendSlackWebhook(cfg.slackWebhook, msg).catch(function(){});
+    if(cfg.telegramToken && cfg.telegramChat) sendTelegramMessage(cfg.telegramToken, cfg.telegramChat, msg).catch(function(){});
+  }
+  function setNotifStatus(id, msg, kind){
+    var el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'notif-status' + (kind ? ' '+kind : '');
+  }
+
+  function initNotifModule(){
+    var cfg = loadNotifConfig();
+    var slackWebhook = document.getElementById('notifSlackWebhook');
+    var tgToken = document.getElementById('notifTelegramToken');
+    var tgChat = document.getElementById('notifTelegramChat');
+    var emailTo = document.getElementById('notifEmailTo');
+    slackWebhook.value = cfg.slackWebhook || '';
+    tgToken.value = cfg.telegramToken || '';
+    tgChat.value = cfg.telegramChat || '';
+    emailTo.value = cfg.emailTo || '';
+
+    function persist(key, value){ cfg[key] = value; saveNotifConfig(cfg); }
+    slackWebhook.addEventListener('input', function(e){ persist('slackWebhook', e.target.value); });
+    tgToken.addEventListener('input', function(e){ persist('telegramToken', e.target.value); });
+    tgChat.addEventListener('input', function(e){ persist('telegramChat', e.target.value); });
+    emailTo.addEventListener('input', function(e){ persist('emailTo', e.target.value); });
+
+    document.getElementById('notifSlackTest').addEventListener('click', function(){
+      var url = slackWebhook.value.trim();
+      var msg = document.getElementById('notifSlackMsg').value.trim() || 'Prueba desde el Portal de Operaciones.';
+      if(!url){ setNotifStatus('notifSlackStatus', 'Pegá primero la URL del webhook.', 'err'); return; }
+      setNotifStatus('notifSlackStatus', 'Enviando...', null);
+      sendSlackWebhook(url, msg)
+        .then(function(){ setNotifStatus('notifSlackStatus', 'Mensaje despachado. Slack no deja confirmar la entrega desde el navegador (CORS) — revisá el canal para confirmar que llegó.', 'ok'); })
+        .catch(function(err){ setNotifStatus('notifSlackStatus', 'No se pudo enviar: ' + err.message, 'err'); });
+    });
+
+    document.getElementById('notifTelegramTest').addEventListener('click', function(){
+      var token = tgToken.value.trim();
+      var chat = tgChat.value.trim();
+      var msg = document.getElementById('notifTelegramMsg').value.trim() || 'Prueba desde el Portal de Operaciones.';
+      if(!token || !chat){ setNotifStatus('notifTelegramStatus', 'Completá el token del bot y el chat ID.', 'err'); return; }
+      setNotifStatus('notifTelegramStatus', 'Enviando...', null);
+      sendTelegramMessage(token, chat, msg).then(function(){
+        setNotifStatus('notifTelegramStatus', 'Mensaje enviado a Telegram ✓', 'ok');
+      }).catch(function(err){ setNotifStatus('notifTelegramStatus', 'No se pudo enviar: ' + err.message, 'err'); });
+    });
+
+    document.getElementById('notifEmailTest').addEventListener('click', function(){
+      var to = emailTo.value.trim();
+      var subject = document.getElementById('notifEmailSubject').value.trim() || 'Notificación del Portal de Operaciones';
+      var body = document.getElementById('notifEmailBody').value.trim() || 'Mensaje de prueba.';
+      if(!to){ setNotifStatus('notifEmailStatus', 'Completá el email destino.', 'err'); return; }
+      var mailtoUrl = 'mailto:' + encodeURIComponent(to) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      window.location.href = mailtoUrl;
+      setNotifStatus('notifEmailStatus', 'Se abrió tu cliente de correo con el mensaje precargado.', 'ok');
+    });
+  }
+
+  /* ============================================================
+     MONITOREO — chequeo HTTP periódico + alerta por notifyAllChannels
+  ============================================================ */
+  var MONITOR_KEY = 'smartans_portal_monitor_v1';
+  var MONITOR_INTERVAL_MS = 30000;
+  var monitorData = null;
+  var monitorTimer = null;
+
+  function loadMonitor(){ try{ return JSON.parse(localStorage.getItem(MONITOR_KEY)) || {services:[]}; }catch(e){ return {services:[]}; } }
+  function saveMonitor(m){ try{ localStorage.setItem(MONITOR_KEY, JSON.stringify(m)); }catch(e){} }
+  function fmtLatency(ms){ return ms==null ? '—' : ms+' ms'; }
+  function fmtAgo(ts){
+    if(!ts) return 'nunca';
+    var s = Math.round((Date.now()-ts)/1000);
+    if(s < 60) return 'hace ' + s + 's';
+    var m = Math.round(s/60);
+    if(m < 60) return 'hace ' + m + 'min';
+    return 'hace ' + Math.round(m/60) + 'h';
+  }
+
+  function renderMonitor(){
+    var body = document.getElementById('monBody');
+    var list = monitorData.services;
+    document.getElementById('monEmpty').style.display = list.length ? 'none' : 'block';
+    body.innerHTML = list.map(function(s){
+      var dotClass = s.status === 'up' ? 'g' : (s.status === 'down' ? 'r' : 'y');
+      var statusLabel = s.status === 'up' ? 'Arriba' : (s.status === 'down' ? 'Caído' : 'Sin verificar');
+      if(s.status === 'up' && s.corsBlocked) statusLabel = 'Responde (sin código HTTP)';
+      return '<tr>'
+        + '<td><span class="row-name">'+esc(s.name)+'</span><br><span style="font-size:11px;color:var(--erp-muted);">'+esc(s.url)+'</span></td>'
+        + '<td><span class="dot '+dotClass+'"></span>'+statusLabel+'</td>'
+        + '<td>'+fmtLatency(s.lastLatencyMs)+'</td>'
+        + '<td>'+fmtAgo(s.lastCheck)+'</td>'
+        + '<td><div class="row-actions">'
+        +   '<button class="icon-btn" title="Verificar ahora" data-action="check" data-id="'+s.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg></button>'
+        +   '<button class="icon-btn danger" title="Eliminar" data-action="del" data-id="'+s.id+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><path d="M9 7V4.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7"/></svg></button>'
+        + '</div></td></tr>';
+    }).join('');
+  }
+
+  /* intenta CORS normal (da código HTTP real); si falla, reintenta no-cors solo para saber si hay conectividad */
+  function checkService(svc){
+    var start = Date.now();
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
+    return fetch(svc.url, {method:'GET', mode:'cors', cache:'no-store', signal: controller.signal})
+      .then(function(r){ clearTimeout(timeoutId); return {ok: r.ok, latency: Date.now()-start, corsBlocked:false}; })
+      .catch(function(){
+        clearTimeout(timeoutId);
+        var c2 = new AbortController();
+        var t2 = setTimeout(function(){ c2.abort(); }, 8000);
+        var start2 = Date.now();
+        return fetch(svc.url, {method:'GET', mode:'no-cors', cache:'no-store', signal: c2.signal})
+          .then(function(){ clearTimeout(t2); return {ok:true, latency:Date.now()-start2, corsBlocked:true}; })
+          .catch(function(){ clearTimeout(t2); return {ok:false, latency:null, corsBlocked:false}; });
+      });
+  }
+
+  function runCheck(svc){
+    return checkService(svc).then(function(result){
+      var wasDown = svc.status === 'down';
+      svc.lastCheck = Date.now();
+      svc.lastLatencyMs = result.latency;
+      svc.corsBlocked = result.corsBlocked;
+      if(result.ok){
+        svc.status = 'up';
+        if(wasDown) notifyAllChannels('✅ ' + svc.name + ' volvió a responder (' + svc.url + ').');
+      } else {
+        svc.status = 'down';
+        if(!wasDown) notifyAllChannels('🔴 ' + svc.name + ' no responde (' + svc.url + ').');
+      }
+      saveMonitor(monitorData);
+      renderMonitor();
+    });
+  }
+
+  function checkAllServices(){
+    monitorData.services.forEach(function(s){ runCheck(s); });
+  }
+
+  function initMonitorModule(){
+    monitorData = loadMonitor();
+    renderMonitor();
+
+    document.getElementById('monAdd').addEventListener('click', function(){
+      var name = document.getElementById('monName').value.trim();
+      var url = document.getElementById('monUrl').value.trim();
+      if(!name || !url) return;
+      if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
+      var svc = {id: uid(), name:name, url:url, status:'unknown', lastCheck:null, lastLatencyMs:null, corsBlocked:false};
+      monitorData.services.push(svc);
+      saveMonitor(monitorData);
+      document.getElementById('monName').value = ''; document.getElementById('monUrl').value = '';
+      renderMonitor();
+      runCheck(svc);
+    });
+
+    document.getElementById('monCheckAll').addEventListener('click', checkAllServices);
+
+    document.getElementById('monBody').addEventListener('click', function(e){
+      var btn = e.target.closest('[data-action]');
+      if(!btn) return;
+      var id = btn.dataset.id;
+      var svc = monitorData.services.filter(function(s){ return s.id === id; })[0];
+      if(btn.dataset.action === 'check' && svc){ runCheck(svc); }
+      else if(btn.dataset.action === 'del'){
+        monitorData.services = monitorData.services.filter(function(s){ return s.id !== id; });
+        saveMonitor(monitorData);
+        renderMonitor();
+      }
+    });
+
+    if(monitorTimer) clearInterval(monitorTimer);
+    monitorTimer = setInterval(checkAllServices, MONITOR_INTERVAL_MS);
+  }
+
   function initEvents(){
+    initNotifModule();
+    initMonitorModule();
     document.getElementById('navFichas').addEventListener('click', function(){ showView('list'); renderList(); });
+    document.getElementById('navRPA').addEventListener('click', function(){ showView('rpa'); });
+    document.getElementById('navAgentes').addEventListener('click', function(){ showView('agentes'); });
+    document.getElementById('navMonitoreo').addEventListener('click', function(){ showView('monitoreo'); });
+    document.getElementById('navNotificaciones').addEventListener('click', function(){ showView('notificaciones'); });
     document.getElementById('btnBack').addEventListener('click', function(){ showView('list'); renderList(); });
     document.getElementById('searchInput').addEventListener('input', renderList);
 
@@ -1466,12 +1798,22 @@
   function setAuthed(){ try{ sessionStorage.setItem(AUTH_KEY, '1'); }catch(e){} }
   function clearAuthed(){ try{ sessionStorage.removeItem(AUTH_KEY); }catch(e){} }
 
+  var captchaAnswer = null;
+  function newCaptcha(){
+    var a = 1 + Math.floor(Math.random()*9);
+    var b = 1 + Math.floor(Math.random()*9);
+    captchaAnswer = a + b;
+    document.getElementById('captchaLabel').textContent = 'Verificación: ¿cuánto es ' + a + ' + ' + b + '?';
+    document.getElementById('loginCaptcha').value = '';
+  }
+
   function showLogin(){
     document.getElementById('appShell').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('loginError').classList.remove('show');
     var u = document.getElementById('loginUser'), p = document.getElementById('loginPass');
     u.value = ''; p.value = ''; u.focus();
+    newCaptcha();
   }
   function enterApp(){
     document.getElementById('loginScreen').style.display = 'none';
@@ -1487,11 +1829,13 @@
       e.preventDefault();
       var u = document.getElementById('loginUser').value.trim().toLowerCase();
       var p = document.getElementById('loginPass').value;
-      if(u === AUTH_USER && p === AUTH_PASS){
+      var captchaOk = parseInt(document.getElementById('loginCaptcha').value, 10) === captchaAnswer;
+      if(u === AUTH_USER && p === AUTH_PASS && captchaOk){
         setAuthed();
         enterApp();
       } else {
         document.getElementById('loginError').classList.add('show');
+        newCaptcha();
       }
     });
     document.getElementById('btnLogout').addEventListener('click', function(){
