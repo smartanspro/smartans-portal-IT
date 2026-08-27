@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Smartans — Fichas de Inversión</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Archivo:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
@@ -5,7 +6,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <style>
   :root{
@@ -839,75 +839,40 @@
   }
 
   /* ============================================================
-     GOOGLE DRIVE — subida del PDF + link público
-     Requiere: 1) el portal alojado en un dominio http(s), no file://
-               2) un OAuth Client ID de Google Cloud Console configurado abajo
-     Ver README para los pasos de configuración.
+     GOOGLE DRIVE — subida del PDF vía Google Apps Script Web App
+     No usa OAuth del lado del cliente (sin popups, sin scopes, sin
+     revocar accesos): el script corre con los permisos de Drive de
+     la cuenta que lo desplegó, y acepta el POST de cualquier origen.
+     Ver README para los pasos de creación del Apps Script.
   ============================================================ */
-  var GOOGLE_CLIENT_ID = '465916250526-jg7h9908f477j7gr3kvc8cj7oo3ol393.apps.googleusercontent.com';
-  var DRIVE_FOLDER_ID = '1ngNIzPC7Hhu5vTurAJApxeCgcO7IvpkY';
-  var DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive';
-  var driveAccessToken = null;
-  var driveTokenClient = null;
-  var _driveResolve = null, _driveReject = null;
+  var APPS_SCRIPT_URL = 'PEGAR_TU_URL_DE_APPS_SCRIPT_AQUI';
 
-  function driveConfigured(){
-    return !!GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID.indexOf('PEGAR_TU_CLIENT_ID') !== 0;
+  function appsScriptConfigured(){
+    return !!APPS_SCRIPT_URL && APPS_SCRIPT_URL.indexOf('PEGAR_TU_URL') !== 0;
   }
-  function getDriveTokenClient(){
-    if(driveTokenClient) return driveTokenClient;
-    driveTokenClient = google.accounts.oauth2.initTokenClient({
-      client_id: GOOGLE_CLIENT_ID,
-      scope: DRIVE_SCOPE,
-      callback: function(resp){
-        if(resp.error){ if(_driveReject) _driveReject(new Error(resp.error)); return; }
-        driveAccessToken = resp.access_token;
-        setTimeout(function(){ driveAccessToken = null; }, Math.max(60000, (resp.expires_in||3600)*1000 - 60000));
-        if(_driveResolve) _driveResolve(driveAccessToken);
-      }
-    });
-    return driveTokenClient;
-  }
-  function ensureDriveAuth(){
+  function blobToBase64(blob){
     return new Promise(function(resolve, reject){
-      if(location.protocol === 'file:'){
-        reject(new Error('El portal está abierto como archivo local (file://); Google Drive solo funciona si está alojado en una URL http(s).'));
-        return;
-      }
-      if(!driveConfigured()){
-        reject(new Error('Falta configurar el Client ID de Google Drive en el código (ver README).'));
-        return;
-      }
-      if(!window.google || !window.google.accounts || !window.google.accounts.oauth2){
-        reject(new Error('No se pudo cargar el inicio de sesión de Google (revisá tu conexión a internet).'));
-        return;
-      }
-      if(driveAccessToken){ resolve(driveAccessToken); return; }
-      _driveResolve = resolve; _driveReject = reject;
-      getDriveTokenClient().requestAccessToken({prompt:'consent'});
+      var reader = new FileReader();
+      reader.onload = function(){ resolve(String(reader.result).split(',')[1]); };
+      reader.onerror = function(){ reject(new Error('No se pudo leer el PDF generado.')); };
+      reader.readAsDataURL(blob);
     });
   }
-  /* recibe el token YA obtenido — la autenticación se pide aparte, antes de generar el PDF */
-  function uploadPdfToDriveWithToken(token, blob, filename){
-    var metadata = {name: filename, parents: [DRIVE_FOLDER_ID], mimeType: 'application/pdf'};
-    var form = new FormData();
-    form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
-    form.append('file', blob);
-    return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
-      method:'POST',
-      headers:{ 'Authorization':'Bearer ' + token },
-      body: form
-    }).then(function(r){
-      if(!r.ok) return r.text().then(function(t){ throw new Error('Drive rechazó la subida (' + r.status + '): ' + t); });
-      return r.json();
-    }).then(function(fileData){
-      return fetch('https://www.googleapis.com/drive/v3/files/' + fileData.id + '/permissions', {
-        method:'POST',
-        headers:{ 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' },
-        body: JSON.stringify({role:'reader', type:'anyone'})
+  function uploadPdfViaAppsScript(blob, filename){
+    if(!appsScriptConfigured()){
+      return Promise.reject(new Error('Falta configurar la URL de Apps Script en el código (ver README).'));
+    }
+    return blobToBase64(blob).then(function(base64Data){
+      return fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain'}, // evita el preflight OPTIONS que Apps Script no maneja
+        body: JSON.stringify({fileData: base64Data, fileName: filename, mimeType: 'application/pdf'})
       }).then(function(r){
-        if(!r.ok) return r.text().then(function(t){ throw new Error('No se pudo hacer público el archivo (' + r.status + '): ' + t); });
-        return fileData.webViewLink || ('https://drive.google.com/file/d/' + fileData.id + '/view?usp=sharing');
+        if(!r.ok) return r.text().then(function(t){ throw new Error('Apps Script respondió ' + r.status + ': ' + t); });
+        return r.json();
+      }).then(function(data){
+        if(!data.ok) throw new Error(data.error || 'Apps Script devolvió un error al subir el archivo.');
+        return data.link;
       });
     });
   }
@@ -916,21 +881,12 @@
     loading.classList.add('show');
     var filename = 'Ficha_'+slug(filenameBase)+'.pdf';
 
-    /* El popup de login de Google solo se deja abrir DENTRO del mismo gesto de click
-       del usuario — si primero generamos el PDF (async, tarda) y recién después pedimos
-       el login, el navegador ya no lo asocia al click y lo bloquea en silencio (quedaba
-       colgado con el spinner girando). Por eso acá se pide el token PRIMERO, y el PDF
-       se genera después. */
-    return ensureDriveAuth().then(function(token){
-      return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
-        return uploadPdfToDriveWithToken(token, pdfBlob, filename).then(function(driveLink){
-          window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(driveLink)), '_blank', 'noopener');
-          showToast('PDF subido a Drive — WhatsApp abierto con el link listo.');
-        });
-      });
-    }).catch(function(driveErr){
-      console.warn('Drive no disponible, uso el flujo manual:', driveErr.message);
-      return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
+    return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
+      return uploadPdfViaAppsScript(pdfBlob, filename).then(function(driveLink){
+        window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(driveLink)), '_blank', 'noopener');
+        showToast('PDF subido a Drive — WhatsApp abierto con el link listo.');
+      }).catch(function(driveErr){
+        console.warn('Drive no disponible, uso el flujo manual:', driveErr.message);
         return saveFile(pdfBlob, filename).then(function(){
           window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(null)), '_blank', 'noopener');
           showToast('Drive no disponible (' + driveErr.message + ') — PDF descargado, adjuntalo a mano en WhatsApp.', true);
