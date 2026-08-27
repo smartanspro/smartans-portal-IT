@@ -663,7 +663,7 @@
       <div class="panel" style="padding:16px 18px; margin-bottom:16px;">
         <div class="row2" style="align-items:end;">
           <div class="field" style="margin-bottom:0;"><label for="monName">Nombre del servicio</label><input type="text" id="monName" placeholder="Ej: API Facturación" /></div>
-          <div class="field" style="margin-bottom:0;"><label for="monUrl">URL a chequear</label><input type="text" id="monUrl" placeholder="https://api.miservicio.com/health" /></div>
+          <div class="field" style="margin-bottom:0;"><label for="monUrl">URL a chequear</label><input type="text" id="monUrl" placeholder="https://api.miservicio.com/health" /><div class="hint">Tiene que incluir <code>http://</code> o <code>https://</code> — sin protocolo el chequeo no puede completarse.</div></div>
         </div>
         <button class="btn btn-primary" type="button" id="monAdd" style="margin-top:12px;">+ Agregar servicio</button>
       </div>
@@ -1665,19 +1665,26 @@
   /* intenta CORS normal (da código HTTP real); si falla, reintenta no-cors solo para saber si hay conectividad */
   function checkService(svc){
     var start = Date.now();
-    var controller = new AbortController();
-    var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
-    return fetch(svc.url, {method:'GET', mode:'cors', cache:'no-store', signal: controller.signal})
-      .then(function(r){ clearTimeout(timeoutId); return {ok: r.ok, latency: Date.now()-start, corsBlocked:false}; })
-      .catch(function(){
-        clearTimeout(timeoutId);
-        var c2 = new AbortController();
-        var t2 = setTimeout(function(){ c2.abort(); }, 8000);
-        var start2 = Date.now();
-        return fetch(svc.url, {method:'GET', mode:'no-cors', cache:'no-store', signal: c2.signal})
-          .then(function(){ clearTimeout(t2); return {ok:true, latency:Date.now()-start2, corsBlocked:true}; })
-          .catch(function(){ clearTimeout(t2); return {ok:false, latency:null, corsBlocked:false}; });
-      });
+    return Promise.resolve().then(function(){
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function(){ controller.abort(); }, 8000);
+      return fetch(svc.url, {method:'GET', mode:'cors', cache:'no-store', signal: controller.signal})
+        .then(function(r){ clearTimeout(timeoutId); return {ok: r.ok, latency: Date.now()-start, corsBlocked:false}; })
+        .catch(function(){
+          clearTimeout(timeoutId);
+          var c2 = new AbortController();
+          var t2 = setTimeout(function(){ c2.abort(); }, 8000);
+          var start2 = Date.now();
+          return Promise.resolve().then(function(){
+            return fetch(svc.url, {method:'GET', mode:'no-cors', cache:'no-store', signal: c2.signal});
+          })
+            .then(function(){ clearTimeout(t2); return {ok:true, latency:Date.now()-start2, corsBlocked:true}; })
+            .catch(function(){ clearTimeout(t2); return {ok:false, latency:null, corsBlocked:false}; });
+        });
+    }).catch(function(){
+      /* fetch() puede lanzar de forma síncrona con una URL sin protocolo (ej. sin http/https) */
+      return {ok:false, latency:null, corsBlocked:false};
+    });
   }
 
   function runCheck(svc){
@@ -1710,7 +1717,6 @@
       var name = document.getElementById('monName').value.trim();
       var url = document.getElementById('monUrl').value.trim();
       if(!name || !url) return;
-      if(!/^https?:\/\//i.test(url)) url = 'https://' + url;
       var svc = {id: uid(), name:name, url:url, status:'unknown', lastCheck:null, lastLatencyMs:null, corsBlocked:false};
       monitorData.services.push(svc);
       saveMonitor(monitorData);
