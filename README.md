@@ -23,14 +23,24 @@ No necesita instalación ni backend: todo corre en el navegador, incluida la gen
 
 Para ver los datos ya cargados de ejemplo, abrí una de las fichas semilla (Ugarte 2729 o Edificio Lavalle 796) desde el listado, o tocá **"Cargar ejemplo"** dentro de cada editor.
 
-## Acceso
+## Acceso, usuarios y roles
 
-El portal pide usuario y contraseña antes de mostrar el listado:
+El portal pide usuario, contraseña y una verificación simple antes de mostrar el listado. A diferencia de la primera versión, **las credenciales ya no están en el código** — viven en una Google Sheet, validadas por el mismo Apps Script que sube los PDFs a Drive.
 
-- **Usuario:** `smartans`
-- **Contraseña:** `smartans`
+- La sesión se mantiene mientras la pestaña del navegador siga abierta (se cierra con **"Cerrar sesión"** en el sidebar).
+- Hay dos roles: **Usuario** (accede a todo el portal) y **Administrador** (además ve **"Administración → Usuarios y Roles"**, donde se dan de alta/baja/modifican los demás usuarios).
+- El primer ingreso es con el usuario semilla que crea el script solo la primera vez: **`smartans` / `smartans`**, rol Administrador. Entrá con esas credenciales y, desde "Usuarios y Roles", cambiale la contraseña (editalo y poné una nueva) o creá tu propio admin y deshabilitá/borrá el semilla.
+- Las contraseñas se guardan hasheadas (SHA-256 con sal por usuario) en la Sheet, nunca en texto plano — pero igual, al no haber un sistema de sesión con expiración/token real, cada acción de administración reenvía tu usuario y contraseña al backend en cada pedido. Es un nivel de seguridad razonable para uso interno, no el estándar de una app bancaria.
 
-La sesión se mantiene mientras la pestaña del navegador siga abierta (se puede cerrar con **"Cerrar sesión"** en el sidebar). Importante: esto es un control de acceso simple para uso interno, **no es seguridad real** — al ser un único archivo HTML sin backend, cualquiera que abra el código fuente puede leer el usuario y la contraseña. No lo uses para proteger información sensible; sirve para evitar que alguien entre por error, no para bloquear un acceso deliberado.
+### Configurar el backend de usuarios
+
+Usa el mismo Apps Script que ya tenías para Drive — hay que actualizarlo:
+
+1. Creá una Google Sheet nueva (podés llamarla "Portal — Usuarios") y copiá su ID de la URL: `docs.google.com/spreadsheets/d/`**`ESTE-ID`**`/edit`.
+2. Abrí `Code.gs` de esta carpeta, pegá ese ID en la constante `SPREADSHEET_ID`.
+3. En [script.google.com](https://script.google.com), abrí tu proyecto existente, borrá **todo** el `Code.gs` que tenías y pegá el nuevo completo.
+4. **Implementar → Gestionar implementaciones** → editá la implementación activa → guardá (esto aplica los cambios sin cambiar la URL que ya tenías configurada en `index.html`).
+5. Entrá al portal con `smartans` / `smartans` — el script crea la hoja "Usuarios" sola en el primer login, con ese usuario semilla.
 
 ## Dónde vive la información
 

@@ -1,30 +1,63 @@
 // ============================================================
-// Apps Script Web App — recibe un PDF en base64 (POST) y lo sube
-// a una carpeta específica de Google Drive, devolviendo el link.
+// Apps Script Web App — backend liviano del Portal de Operaciones.
+// Maneja DOS cosas con una sola URL desplegada:
+//   1) Subida de PDFs a Drive (acción "uploadPdf")
+//   2) Login + ABM de usuarios y roles contra una Google Sheet (acciones
+//      "login" / "listUsers" / "createUser" / "updateUser" / "deleteUser")
 //
-// Cómo usarlo:
-// 1. Andá a script.google.com → Nuevo proyecto.
-// 2. Borrá el contenido de Code.gs y pegá TODO este archivo.
-// 3. Revisá que FOLDER_ID sea el de tu carpeta "FICHAS" en Drive
-//    (ya viene con el ID correcto, pero confirmalo).
-// 4. Implementar → Nueva implementación → tipo "Aplicación web".
-//    - Ejecutar como: Yo (tu cuenta, la dueña de la carpeta).
-//    - Quién tiene acceso: Cualquier usuario.
-// 5. Autorizá los permisos que te pida (acceso a tu Drive).
-// 6. Copiá la URL que te da ("URL de la aplicación web", termina
-//    en /exec) y pegala en index.html en la constante
-//    APPS_SCRIPT_URL, reemplazando 'PEGAR_TU_URL_DE_APPS_SCRIPT_AQUI'.
-//
-// Cada vez que modifiques este script, tenés que crear una NUEVA
-// implementación (o editar la existente) para que los cambios se
-// apliquen — guardar el script solo no alcanza.
+// Cómo usarlo (reemplaza TODO tu Code.gs actual por este archivo):
+// 1. Creá una Google Sheet nueva (o usá una que ya tengas) para guardar
+//    los usuarios. Abrila, copiá el ID de la URL:
+//    docs.google.com/spreadsheets/d/ESTE-ID/edit
+// 2. Pegá ese ID en SPREADSHEET_ID más abajo.
+// 3. Revisá que FOLDER_ID siga siendo el de tu carpeta de Drive ("FICHAS").
+// 4. En script.google.com, borrá TODO tu Code.gs actual y pegá este archivo.
+// 5. Implementar → Gestionar implementaciones → editá la implementación
+//    activa → guardá (o creá una nueva implementación) para que tome
+//    los cambios. "Quién tiene acceso" tiene que seguir en "Cualquier
+//    usuario".
+// 6. La primera vez que se ejecuta, si la hoja "Usuarios" no existe, el
+//    script la crea sola con un usuario semilla:
+//      usuario: smartans   contraseña: smartans   rol: admin
+//    Entrá al portal con esas credenciales y cambiá esa contraseña (o
+//    creá tu propio usuario admin y desactivá/borrá el semilla) desde
+//    la pantalla "Administración → Usuarios y Roles".
 // ============================================================
 
-var FOLDER_ID = '1ngNIzPC7Hhu5vTurAJApxeCgcO7IvpkY'; // ID de la carpeta "FICHAS" en Drive
+var FOLDER_ID = '1ngNIzPC7Hhu5vTurAJApxeCgcO7IvpkY';       // carpeta de Drive para los PDFs
+var SPREADSHEET_ID = '18-ohD9jvNt9veG-J4zHyeh5WnBtw2Fbl1geTtBdZcj4'; // Google Sheet para usuarios
+var USERS_SHEET_NAME = 'Usuarios';
 
 function doPost(e) {
+  var body;
   try {
-    var datos = JSON.parse(e.postData.contents);
+    body = JSON.parse(e.postData.contents);
+  } catch (err) {
+    return jsonOut({ ok: false, error: 'Cuerpo de la petición inválido.' });
+  }
+
+  var action = body.action || 'uploadPdf'; // compatibilidad con peticiones viejas sin "action"
+
+  switch (action) {
+    case 'uploadPdf':   return handleUploadPdf(body);
+    case 'login':       return handleLogin(body);
+    case 'listUsers':   return handleListUsers(body);
+    case 'createUser':  return handleCreateUser(body);
+    case 'updateUser':  return handleUpdateUser(body);
+    case 'deleteUser':  return handleDeleteUser(body);
+    default:            return jsonOut({ ok: false, error: 'Acción desconocida: ' + action });
+  }
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+/* ============================================================
+   SUBIDA DE PDF A DRIVE
+============================================================ */
+function handleUploadPdf(datos) {
+  try {
     var bytes = Utilities.base64Decode(datos.fileData);
     var blob = Utilities.newBlob(bytes, datos.mimeType || 'application/pdf', datos.fileName || 'archivo.pdf');
 
@@ -33,14 +66,122 @@ function doPost(e) {
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
 
     var link = 'https://drive.google.com/file/d/' + file.getId() + '/view?usp=sharing';
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true, link: link, id: file.getId() }))
-      .setMimeType(ContentService.MimeType.JSON);
-
+    return jsonOut({ ok: true, link: link, id: file.getId() });
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonOut({ ok: false, error: String(err) });
   }
+}
+
+/* ============================================================
+   USUARIOS — helpers de la hoja de cálculo
+   Columnas: usuario | passwordHash | salt | rol | activo
+============================================================ */
+function getUsersSheet_() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var sheet = ss.getSheetByName(USERS_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(USERS_SHEET_NAME);
+  }
+  if (sheet.getLastRow() === 0) {
+    // hoja recién creada, o ya existía pero completamente vacía: sembramos headers + admin
+    sheet.appendRow(['usuario', 'passwordHash', 'salt', 'rol', 'activo']);
+    // usuario semilla para el primer ingreso — cambiar la contraseña apenas se pueda
+    var salt = makeSalt_();
+    sheet.appendRow(['smartans', hashPassword_('smartans', salt), salt, 'admin', true]);
+  }
+  return sheet;
+}
+function makeSalt_() {
+  return Utilities.getUuid();
+}
+function hashPassword_(password, salt) {
+  var raw = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, password + ':' + salt);
+  return raw.map(function (b) { return ('0' + (b & 0xFF).toString(16)).slice(-2); }).join('');
+}
+function findUserRow_(sheet, usuario) {
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] === usuario) return { index: i + 1, row: rows[i] }; // index 1-based para getRange
+  }
+  return null;
+}
+function isAdmin_(usuario, password) {
+  if (!usuario || !password) return false;
+  var sheet = getUsersSheet_();
+  var found = findUserRow_(sheet, usuario);
+  if (!found) return false;
+  var row = found.row;
+  if (row[4] !== true) return false;
+  if (row[3] !== 'admin') return false;
+  return hashPassword_(password, row[2]) === row[1];
+}
+
+/* ============================================================
+   LOGIN
+============================================================ */
+function handleLogin(datos) {
+  try {
+    var sheet = getUsersSheet_();
+    var found = findUserRow_(sheet, datos.usuario);
+    if (!found) return jsonOut({ ok: false, error: 'Usuario o contraseña incorrectos.' });
+    var row = found.row;
+    if (row[4] !== true) return jsonOut({ ok: false, error: 'Ese usuario está deshabilitado.' });
+    if (hashPassword_(datos.password, row[2]) !== row[1]) {
+      return jsonOut({ ok: false, error: 'Usuario o contraseña incorrectos.' });
+    }
+    return jsonOut({ ok: true, rol: row[3] });
+  } catch (err) {
+    return jsonOut({ ok: false, error: String(err) });
+  }
+}
+
+/* ============================================================
+   ABM DE USUARIOS (requiere adminUser/adminPassword de un admin activo)
+============================================================ */
+function handleListUsers(datos) {
+  if (!isAdmin_(datos.adminUser, datos.adminPassword)) return jsonOut({ ok: false, error: 'No autorizado.' });
+  var sheet = getUsersSheet_();
+  var rows = sheet.getDataRange().getValues();
+  var users = [];
+  for (var i = 1; i < rows.length; i++) {
+    users.push({ usuario: rows[i][0], rol: rows[i][3], activo: rows[i][4] === true });
+  }
+  return jsonOut({ ok: true, users: users });
+}
+
+function handleCreateUser(datos) {
+  if (!isAdmin_(datos.adminUser, datos.adminPassword)) return jsonOut({ ok: false, error: 'No autorizado.' });
+  if (!datos.usuario || !datos.password) return jsonOut({ ok: false, error: 'Faltan datos del usuario nuevo.' });
+  var sheet = getUsersSheet_();
+  if (findUserRow_(sheet, datos.usuario)) return jsonOut({ ok: false, error: 'Ese usuario ya existe.' });
+  var salt = makeSalt_();
+  var hash = hashPassword_(datos.password, salt);
+  sheet.appendRow([datos.usuario, hash, salt, datos.rol || 'usuario', true]);
+  return jsonOut({ ok: true });
+}
+
+function handleUpdateUser(datos) {
+  if (!isAdmin_(datos.adminUser, datos.adminPassword)) return jsonOut({ ok: false, error: 'No autorizado.' });
+  var sheet = getUsersSheet_();
+  var found = findUserRow_(sheet, datos.usuario);
+  if (!found) return jsonOut({ ok: false, error: 'Usuario no encontrado.' });
+  if (datos.nuevoPassword) {
+    var salt = makeSalt_();
+    var hash = hashPassword_(datos.nuevoPassword, salt);
+    sheet.getRange(found.index, 2).setValue(hash);
+    sheet.getRange(found.index, 3).setValue(salt);
+  }
+  if (datos.rol) sheet.getRange(found.index, 4).setValue(datos.rol);
+  if (typeof datos.activo === 'boolean') sheet.getRange(found.index, 5).setValue(datos.activo);
+  return jsonOut({ ok: true });
+}
+
+function handleDeleteUser(datos) {
+  if (!isAdmin_(datos.adminUser, datos.adminPassword)) return jsonOut({ ok: false, error: 'No autorizado.' });
+  if (datos.usuario === datos.adminUser) return jsonOut({ ok: false, error: 'No podés eliminar el usuario con el que estás logueado.' });
+  var sheet = getUsersSheet_();
+  var found = findUserRow_(sheet, datos.usuario);
+  if (!found) return jsonOut({ ok: false, error: 'Usuario no encontrado.' });
+  sheet.deleteRow(found.index);
+  return jsonOut({ ok: true });
 }
