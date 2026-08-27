@@ -887,24 +887,23 @@
       getDriveTokenClient().requestAccessToken({prompt:'consent'});
     });
   }
-  function uploadPdfToDrive(blob, filename){
-    return ensureDriveAuth().then(function(token){
-      var metadata = {name: filename, parents: [DRIVE_FOLDER_ID], mimeType: 'application/pdf'};
-      var form = new FormData();
-      form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
-      form.append('file', blob);
-      return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
-        method:'POST',
-        headers:{ 'Authorization':'Bearer ' + token },
-        body: form
-      }).then(function(r){
-        if(!r.ok) return r.text().then(function(t){ throw new Error('Drive rechazó la subida (' + r.status + '): ' + t); });
-        return r.json();
-      });
+  /* recibe el token YA obtenido — la autenticación se pide aparte, antes de generar el PDF */
+  function uploadPdfToDriveWithToken(token, blob, filename){
+    var metadata = {name: filename, parents: [DRIVE_FOLDER_ID], mimeType: 'application/pdf'};
+    var form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], {type:'application/json'}));
+    form.append('file', blob);
+    return fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
+      method:'POST',
+      headers:{ 'Authorization':'Bearer ' + token },
+      body: form
+    }).then(function(r){
+      if(!r.ok) return r.text().then(function(t){ throw new Error('Drive rechazó la subida (' + r.status + '): ' + t); });
+      return r.json();
     }).then(function(fileData){
       return fetch('https://www.googleapis.com/drive/v3/files/' + fileData.id + '/permissions', {
         method:'POST',
-        headers:{ 'Authorization':'Bearer ' + driveAccessToken, 'Content-Type':'application/json' },
+        headers:{ 'Authorization':'Bearer ' + token, 'Content-Type':'application/json' },
         body: JSON.stringify({role:'reader', type:'anyone'})
       }).then(function(r){
         if(!r.ok) return r.text().then(function(t){ throw new Error('No se pudo hacer público el archivo (' + r.status + '): ' + t); });
@@ -916,12 +915,22 @@
     var loading = document.getElementById('loading');
     loading.classList.add('show');
     var filename = 'Ficha_'+slug(filenameBase)+'.pdf';
-    return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
-      return uploadPdfToDrive(pdfBlob, filename).then(function(driveLink){
-        window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(driveLink)), '_blank', 'noopener');
-        showToast('PDF subido a Drive — WhatsApp abierto con el link listo.');
-      }).catch(function(driveErr){
-        console.warn('Drive no disponible, uso el flujo manual:', driveErr.message);
+
+    /* El popup de login de Google solo se deja abrir DENTRO del mismo gesto de click
+       del usuario — si primero generamos el PDF (async, tarda) y recién después pedimos
+       el login, el navegador ya no lo asocia al click y lo bloquea en silencio (quedaba
+       colgado con el spinner girando). Por eso acá se pide el token PRIMERO, y el PDF
+       se genera después. */
+    return ensureDriveAuth().then(function(token){
+      return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
+        return uploadPdfToDriveWithToken(token, pdfBlob, filename).then(function(driveLink){
+          window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(driveLink)), '_blank', 'noopener');
+          showToast('PDF subido a Drive — WhatsApp abierto con el link listo.');
+        });
+      });
+    }).catch(function(driveErr){
+      console.warn('Drive no disponible, uso el flujo manual:', driveErr.message);
+      return generatePdfBlob(previewId, bgColor).then(function(pdfBlob){
         return saveFile(pdfBlob, filename).then(function(){
           window.open('https://wa.me/?text=' + encodeURIComponent(buildTextFn(null)), '_blank', 'noopener');
           showToast('Drive no disponible (' + driveErr.message + ') — PDF descargado, adjuntalo a mano en WhatsApp.', true);
