@@ -341,61 +341,66 @@
   .contact a svg{width:14px; height:14px; color:var(--doc-gold);}
   .foot-logo-img{height:40px; width:auto; opacity:.92;}
 
-  /* ============ FICHA "crédito con garantía" — paleta clara fija ============ */
+  /* ============ FICHA "crédito con garantía" — navy + dorado (formato Shale/Vaca Muerta) ============ */
   :root{
-    --doc2-bg:#ffffff; --doc2-ink:#1c2530; --doc2-muted:#5b6673; --doc2-border:#e2e5e2;
-    --doc2-olive:#6e6e50; --doc2-olive-dark:#585840; --doc2-steel:#57636d; --doc2-steel-dark:#454f57; --doc2-teal:#3d6672;
+    --doc2-bg:#ffffff; --doc2-ink:#1a2430; --doc2-muted:#657080; --doc2-border:#e2e5ea;
+    --doc2-navy:#0e1b2a; --doc2-gold:#b6893f;
   }
   #previewCredito{width:794px; background:var(--doc2-bg); color:var(--doc2-ink); font-family:"Inter",sans-serif;}
   #previewCredito *{box-sizing:border-box;}
-  .doc-header{display:flex; justify-content:center; padding:30px 0 10px;}
-  .doc-logo{display:flex; flex-direction:column; align-items:center; gap:6px;}
-  .doc-logo-img{height:68px; width:auto; display:block; filter:brightness(0) saturate(100%);}
-  .doc-logo-mark{width:20px; height:20px; color:var(--doc2-ink);}
-  .doc-logo-text{display:flex; flex-direction:column; align-items:center; line-height:1.1;}
-  .doc-logo-text .m1{font-family:"Cormorant Garamond",serif; font-weight:500; font-size:23px; letter-spacing:.24em; color:var(--doc2-ink);}
-  .doc-logo-text .m2{font-family:"Inter",sans-serif; font-weight:600; font-size:8px; letter-spacing:.42em; color:var(--doc2-muted); margin-top:4px;}
-  .doc-h1{font-family:"Archivo",sans-serif; font-weight:800; font-size:25px; color:var(--doc2-teal); text-align:center; padding:4px 0 22px;}
-  .doc-top-row{display:grid; grid-template-columns:1.15fr 1fr; gap:16px; padding:0 40px 20px;}
-  .op-box{background:var(--doc2-olive-dark); border-radius:10px; padding:18px 20px; color:#fff;}
-  .op-box-title{font-family:"Archivo",sans-serif; font-weight:700; font-size:13.5px; line-height:1.4; margin-bottom:14px;}
-  .op-box-sub{font-weight:700; font-size:12px; margin-bottom:6px;}
-  .op-bullets{margin:0; padding-left:18px; font-size:11.5px; line-height:1.7;}
-  .op-bullets li{margin-bottom:2px;}
-  .tna-box{border:1px solid var(--doc2-border); border-radius:10px; padding:14px 18px; background:#fff;}
-  .tna-head{display:flex; justify-content:space-between; align-items:baseline; font-family:"Archivo",sans-serif; font-weight:700; font-size:12.5px; color:var(--doc2-ink); margin-bottom:8px; border-bottom:1px solid var(--doc2-border); padding-bottom:8px;}
-  .tna-head-r{font-size:10.5px; color:var(--doc2-teal); text-transform:uppercase; letter-spacing:.03em;}
-  .tna-row{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 0; font-size:11.5px; flex-wrap:nowrap;}
-  .tna-label{color:var(--doc2-muted); flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .tna-label b{white-space:nowrap;}
-  .tna-dot{color:var(--doc2-steel); flex:none;}
-  .tna-val{flex:none; margin-left:auto; font-family:"Archivo",sans-serif; font-weight:800; font-size:15px; color:var(--doc2-teal); white-space:nowrap;}
-  .cards-row{display:grid; grid-template-columns:repeat(4,1fr); grid-auto-rows:1fr; align-items:stretch; gap:14px; padding:0 40px 18px;}
-  .op-card{border-radius:8px; overflow:hidden; display:flex; flex-direction:column; height:100%;}
-  .op-card-head{padding:14px 8px 12px; text-align:center; min-height:98px; flex:none; display:flex; flex-direction:column; align-items:center; justify-content:center;}
-  .op-card-ic{width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; flex:none;}
-  .op-card-ic svg{width:16px; height:16px; color:#fff;}
-  .op-card-head span{display:block; font-family:"Archivo",sans-serif; font-weight:700; font-size:10.5px; letter-spacing:.01em; color:#fff; line-height:1.3;}
-  .cards-olive .op-card-head{background:var(--doc2-olive);}
-  .cards-steel .op-card-head{background:var(--doc2-steel);}
-  .op-card-body{background:#fff; border:1px solid var(--doc2-border); border-top:none; padding:16px 8px; text-align:center; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;}
-  .card-val-strong{font-family:"Archivo",sans-serif; font-weight:800; font-size:14.5px; color:var(--doc2-ink); line-height:1.35;}
-  .card-sub{font-size:9.5px; color:var(--doc2-muted); margin-top:5px; line-height:1.5;}
-  .doc-h2{font-family:"Archivo",sans-serif; font-weight:700; font-size:14.5px; color:var(--doc2-teal); padding:6px 40px 12px; text-transform:uppercase; letter-spacing:.03em;}
-  .detail-table{margin:0 40px 24px; border:1px solid var(--doc2-border); border-radius:10px; overflow:hidden;}
-  .detail-row{display:grid; grid-template-columns:200px 1fr;}
-  .detail-row + .detail-row{border-top:1px solid var(--doc2-border);}
-  .detail-label{color:#fff; font-family:"Archivo",sans-serif; font-weight:700; font-size:11.5px; display:flex; align-items:center; padding:14px 16px;}
-  .detail-label.olive{background:var(--doc2-olive);} .detail-label.steel{background:var(--doc2-steel);}
-  .detail-content{padding:14px 18px; font-size:11.5px; line-height:1.6; color:var(--doc2-ink); background:#fff;}
-  .detail-content p{margin:0 0 10px;} .detail-content p:last-child{margin-bottom:0;}
-  .tasacion-actual{font-weight:700; margin-top:8px;}
-  .plain-bullets{margin:0; padding-left:18px;}
-  .faqs{padding:0 40px 34px; display:flex; flex-direction:column; gap:16px;}
-  .faq-item{display:flex; gap:14px; align-items:flex-start;}
-  .faq-dot{width:20px; height:20px; border-radius:50%; background:linear-gradient(135deg,var(--doc2-olive),var(--doc2-steel)); flex:none; margin-top:2px;}
-  .faq-q{font-weight:700; font-size:12px; color:var(--doc2-ink); margin-bottom:4px;}
-  .faq-a{font-size:11px; line-height:1.6; color:var(--doc2-muted);}
+
+  .doc-header{display:flex; align-items:center; justify-content:space-between; gap:20px; padding:20px 40px; background:var(--doc2-navy); border-bottom:3px solid var(--doc2-gold);}
+  .doc-logo{display:flex; flex-direction:column; align-items:flex-start; gap:5px;}
+  .doc-logo-img{height:44px; width:auto; display:block; filter:brightness(0) invert(1);}
+  .doc-logo-mark{width:15px; height:15px; color:#fff;}
+  .doc-logo-text{display:flex; flex-direction:column; align-items:flex-start; line-height:1.05;}
+  .doc-logo-text .m1{font-family:"Cormorant Garamond",serif; font-weight:600; font-size:14px; letter-spacing:.14em; color:#fff;}
+  .doc-logo-text .m2{font-family:"Inter",sans-serif; font-weight:600; font-size:6px; letter-spacing:.28em; color:#c7cfd9; margin-top:2px;}
+  .cr2-kicker{text-align:right; font-family:"Archivo",sans-serif; font-weight:700; font-size:9px; letter-spacing:.14em; color:#c7cfd9; text-transform:uppercase; line-height:1.7;}
+
+  .cr2-title-row{display:flex; justify-content:space-between; align-items:flex-end; gap:24px; padding:22px 40px 18px;}
+  .cr2-eyebrow{font-family:"Archivo",sans-serif; font-weight:700; font-size:10px; letter-spacing:.17em; color:var(--doc2-gold); text-transform:uppercase; margin-bottom:8px;}
+  .cr2-title{font-family:"Cormorant Garamond",serif; font-weight:600; font-size:29px; color:var(--doc2-navy); line-height:1.1;}
+  .cr2-subtitle{font-size:11.5px; color:var(--doc2-muted); line-height:1.55; max-width:270px; text-align:right;}
+
+  .cr2-kpi-row{display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--doc2-border); border-bottom:1px solid var(--doc2-border); margin:0 40px;}
+  .cr2-kpi{padding:15px 18px; border-right:1px solid var(--doc2-border);}
+  .cr2-kpi:last-child{border-right:none;}
+  .cr2-kpi-label{font-family:"Archivo",sans-serif; font-weight:700; font-size:8.5px; letter-spacing:.09em; color:var(--doc2-muted); text-transform:uppercase; margin-bottom:8px;}
+  .cr2-kpi-val{font-family:"Archivo",sans-serif; font-weight:800; font-size:18px; color:var(--doc2-navy); white-space:nowrap;}
+  .cr2-kpi-val .unit{font-family:"Inter",sans-serif; font-weight:600; font-size:10.5px; color:var(--doc2-muted); margin-left:2px;}
+
+  .cr2-section{margin:22px 40px 0; border-top:3px solid var(--doc2-gold);}
+  .cr2-section-head{background:var(--doc2-navy); color:#fff; display:flex; align-items:baseline; gap:10px; padding:10px 18px; font-family:"Archivo",sans-serif; font-weight:700; font-size:12px; letter-spacing:.03em; text-transform:uppercase;}
+  .cr2-section-num{color:var(--doc2-gold); font-weight:800;}
+  .cr2-section-body{border:1px solid var(--doc2-border); border-top:none; padding:18px;}
+
+  .cr2-tna-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px;}
+  .cr2-tna-card{border:1px solid var(--doc2-border); border-radius:6px; padding:14px; text-align:center;}
+  .cr2-tna-label{font-family:"Archivo",sans-serif; font-weight:700; font-size:8.5px; letter-spacing:.09em; color:var(--doc2-muted); text-transform:uppercase; margin-bottom:6px;}
+  .cr2-tna-monto{font-family:"Archivo",sans-serif; font-weight:700; font-size:13px; color:var(--doc2-ink); margin-bottom:8px;}
+  .cr2-tna-val{font-family:"Archivo",sans-serif; font-weight:800; font-size:18px; color:var(--doc2-gold);}
+  .cr2-tna-val .unit{font-size:10px; color:var(--doc2-muted); font-weight:600; margin-left:2px;}
+
+  .cr2-cond-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  .cr2-cond-item{border:1.5px solid var(--doc2-gold); border-radius:6px; padding:14px 12px; background:#f1f2f4; text-align:center;}
+  .cr2-cond-label{font-family:"Archivo",sans-serif; font-weight:700; font-size:8.5px; letter-spacing:.08em; color:var(--doc2-gold); text-transform:uppercase; margin-bottom:7px;}
+  .cr2-cond-val{font-family:"Archivo",sans-serif; font-weight:700; font-size:12px; color:var(--doc2-navy); line-height:1.4;}
+
+  .cr2-detail-row{display:grid; grid-template-columns:150px 1fr; gap:16px; padding:12px 0;}
+  .cr2-detail-row + .cr2-detail-row{border-top:1px solid var(--doc2-border);}
+  .cr2-detail-label{font-family:"Archivo",sans-serif; font-weight:700; font-size:9.5px; letter-spacing:.07em; color:var(--doc2-gold); text-transform:uppercase;}
+  .cr2-detail-content{font-size:11.5px; line-height:1.6; color:var(--doc2-ink);}
+  .cr2-detail-content p{margin:0 0 8px;} .cr2-detail-content p:last-child{margin-bottom:0;}
+
+  .cr2-faqs{display:grid; grid-template-columns:1fr 1fr; gap:16px 28px;}
+  .cr2-faq-q{font-weight:700; font-size:11.5px; color:var(--doc2-ink); margin-bottom:4px;}
+  .cr2-faq-q::before{content:"— "; color:var(--doc2-gold);}
+  .cr2-faq-a{font-size:11px; line-height:1.6; color:var(--doc2-muted);}
+
+  .cr2-footer{display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; background:var(--doc2-navy); padding:16px 40px; margin-top:24px;}
+  .cr2-contact{display:flex; gap:18px; flex-wrap:wrap;}
+  .cr2-contact span{color:#cfd6de; font-size:10.5px; font-weight:500;}
 
   /* ============ overlay comunes ============ */
   .loading{position:fixed; inset:0; background:rgba(13,19,25,.55); display:none; align-items:center; justify-content:center; z-index:90; backdrop-filter:blur(2px);}
@@ -566,6 +571,7 @@
           <div class="editor-head"><h1 id="crTituloEditor">Crédito con garantía</h1></div>
           <div class="quickrow" style="display:flex;gap:8px;padding-bottom:10px;">
             <button class="btn btn-small" id="crBtnExample" type="button">✦ Cargar ejemplo (Lavalle 796)</button>
+            <button class="btn btn-small" id="crBtnExample2" type="button">✦ Cargar Shale, Vaca Muerta (Décimo Primer Desembolso)</button>
           </div>
           <form id="crForm" autocomplete="off">
             <fieldset>
@@ -598,6 +604,7 @@
                 <div class="field"><label for="cr-garantia">Tipo de garantía</label><input type="text" id="cr-garantia" name="tipoGarantia" placeholder="Ej: Fideicomiso" /></div>
                 <div class="field"><label for="cr-moneda">Moneda</label><input type="text" id="cr-moneda" name="moneda" placeholder="Ej: Dólares (billete)" /></div>
               </div>
+              <div class="field"><label for="cr-ubicacion">Ubicación</label><input type="text" id="cr-ubicacion" name="ubicacion" placeholder="Ej: Añelo, Neuquén (Vaca Muerta)" /></div>
               <div class="row2">
                 <div class="field"><label for="cr-amort1">Sistema de amortización</label><input type="text" id="cr-amort1" name="amortizacionTitulo" placeholder="Ej: Americano" /></div>
                 <div class="field"><label for="cr-amort2">Detalle de la amortización</label><input type="text" id="cr-amort2" name="amortizacionSub" placeholder="(paga intereses mensuales y el capital al vencimiento)" /></div>
@@ -797,11 +804,6 @@
         <div class="modal-opt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.2 3.4 9.4 8 11 4.6-1.6 8-5.8 8-11V5l-8-3Z"/><path d="M9 12l2 2 4-4"/></svg></div>
         <h3>Crédito con garantía</h3>
         <p>Préstamo privado a tasa fija (TNA escalonada) con inmuebles en garantía vía fideicomiso.</p>
-      </button>
-      <button class="modal-opt" type="button" id="optCreditoII">
-        <div class="modal-opt-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5.2 3.4 9.4 8 11 4.6-1.6 8-5.8 8-11V5l-8-3Z"/><path d="M9 12l2 2 4-4"/><path d="M12 2v20" stroke-dasharray="1 3"/></svg></div>
-        <h3>Crédito con Garantía II</h3>
-        <p>Igual al anterior, pero con tasación actual/proyectada y desembolsos progresivos (como Shale, Vaca Muerta).</p>
       </button>
     </div>
     <div class="modal-foot"><button class="btn" type="button" id="btnCancelModal">Cancelar</button></div>
@@ -1229,7 +1231,7 @@
       operacion:'', nombreInterno:'', fechaEstimada:'',
       tipoInversionBullets:['Colocación de dólares a tasa fija.','Inversión en préstamo privado.','Inmuebles en garantía.'],
       tasacionGarantia:'', tasacionProyectada:'', primerDesembolsoLabel:'Primer Desembolso', primerDesembolso:'', lineaCreditoTotal:'',
-      plazoMeses:'', inversionMinima:'',
+      plazoMeses:'', inversionMinima:'', ubicacion:'',
       tipoGarantia:'Fideicomiso', moneda:'Dólares (billete)',
       amortizacionTitulo:'Americano', amortizacionSub:'(paga intereses mensuales y el capital al vencimiento)',
       tasas:[{desde:25000,tna:''},{desde:50000,tna:''},{desde:100000,tna:''}],
@@ -1245,7 +1247,7 @@
     var EXAMPLE = Object.assign({}, BLANK, {
       operacion:'Edificio Lavalle 796, CABA (Primer Desembolso)', fechaEstimada:'2026-08-06',
       tasacionGarantia:7000000, primerDesembolso:1500000, lineaCreditoTotal:3650000,
-      plazoMeses:36, inversionMinima:25000,
+      plazoMeses:36, inversionMinima:25000, ubicacion:'Lavalle y Esmeralda, Microcentro, CABA',
       tasas:[{desde:25000,tna:10},{desde:50000,tna:11},{desde:100000,tna:12}],
       garantiaInfo:'Edificio de 3.700 m² cubiertos ubicado en la esquina de Lavalle y Esmeralda. Cuenta con 7 plantas de oficinas de entre 300 m² y 450 m², locales comerciales en Planta Baja y depósitos en el subsuelo.\n\nSe encuentra en el epicentro del Microcentro porteño, a 2 cuadras del obelisco, 1 cuadra de Av. Corrientes y a 6 cuadras de Av. Paseo Colón con acceso inmediato a los principales accesos, estaciones de subte y líneas colectivos lo que garantiza una excelente conectividad con toda la Ciudad de Buenos Aires y la Provincia.',
       montoSimulado:100000
@@ -1254,7 +1256,7 @@
       operacion:'Shale, Vaca Muerta (Décimo Primer Desembolso)', nombreInterno:'Crédito con Garantía II', fechaEstimada:'2026-08-24',
       tasacionGarantia:5500000, tasacionProyectada:8000000,
       primerDesembolsoLabel:'Décimo Primer Desembolso', primerDesembolso:150000, lineaCreditoTotal:3000000,
-      plazoMeses:24, inversionMinima:25000,
+      plazoMeses:24, inversionMinima:25000, ubicacion:'Añelo, Neuquén (Vaca Muerta)',
       tasas:[{desde:25000,tna:10},{desde:50000,tna:11},{desde:100000,tna:12}],
       garantiaInfo:'3 Módulos de departamentos de 307 m² cubiertos y 100 m² semi-cubiertos totales, sobre un lote de 360 m², 2 Módulos de departamentos con un grado de avance del 90% y 3 terrenos aptos multifamiliar de 360 m² para replicar edificios con departamentos ubicados en zona estratégica de Añelo (Vaca Muerta).',
       garantiaInfoExtra:'Los desembolsos del crédito se irán realizando a medida que avance la obra, manteniendo siempre un límite de aforo del 50% del valor del inmueble.',
@@ -1338,51 +1340,65 @@
       if(LOGO_DATAURL && LOGO_DATAURL.indexOf('data:') === 0) return '<img class="doc-logo-img" src="'+LOGO_DATAURL+'" alt="SMARTANS" />';
       return '<svg class="doc-logo-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 16 14 12.5 12 12 22 11.5 12 8 14Z"/></svg><div class="doc-logo-text"><span class="m1">SMARTANS</span><span class="m2">GROUP</span></div>';
     }
-    function cardIconSvg(){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 6.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.8 5 3.3 5 1.4 5 3.4-2.2 3-5 3-5-1.1-5-3"/></svg>'; }
-    function card(title, valueHtml){ return '<div class="op-card"><div class="op-card-head"><div class="op-card-ic">'+cardIconSvg()+'</div><span>'+esc(title)+'</span></div><div class="op-card-body">'+valueHtml+'</div></div>'; }
-
+    function tituloCorto(operacion){
+      return (operacion||'').replace(/\s*\([^)]*\)\s*$/, '').trim() || 'Nombre de la operación';
+    }
     function buildPreviewHTML(d){
       var tasasSorted = d.tasas.slice().sort(function(a,b){ return n(a.desde)-n(b.desde); });
-      var tasasRowsHTML = tasasSorted.map(function(t){ return '<div class="tna-row"><span class="tna-label">Invirtiendo desde <b>'+fmtUSD(t.desde)+'</b></span><span class="tna-dot">•</span><span class="tna-val">'+fmtPct(t.tna,2)+'</span></div>'; }).join('') || '<div class="tna-row"><span class="tna-label">Cargá los tramos de tasa a la izquierda.</span></div>';
-      var bulletsInv = d.tipoInversionBullets.filter(function(b){return b.trim();}).map(function(b){ return '<li>'+esc(b)+'</li>'; }).join('');
-      var desembolsoLabel = d.primerDesembolsoLabel || 'Primer Desembolso';
-      var montoCreditoHTML = n(d.lineaCreditoTotal) > 0
-        ? '<div class="card-val-strong">'+esc(desembolsoLabel)+':<br>'+fmtUSD(d.primerDesembolso)+'</div><div class="card-sub">Línea de Crédito Total: '+fmtUSD(d.lineaCreditoTotal)+'</div>'
-        : '<div class="card-val-strong">'+fmtUSD(d.primerDesembolso)+'</div>';
-      var tasacionCardHTML = n(d.tasacionProyectada) > 0
-        ? '<div class="card-val-strong">Valor Actual: '+fmtUSD(d.tasacionGarantia)+'</div><div class="card-sub">(Valor proyectado: '+fmtUSD(d.tasacionProyectada)+')</div>'
-        : '<div class="card-val-strong">'+fmtUSD(d.tasacionGarantia)+'</div>';
-      var tasacionDetailHTML = n(d.tasacionProyectada) > 0
-        ? '<div class="tasacion-actual">Tasación Actual: '+fmtUSD(d.tasacionGarantia)+'</div><div class="tasacion-actual">Tasación Proyectada: '+fmtUSD(d.tasacionProyectada)+'</div>'
-        : '<div class="tasacion-actual">Tasación Actual: '+fmtUSD(d.tasacionGarantia)+'</div>';
-      var formatoGarRows = d.formatoGarantia.filter(function(b){return b.trim();}).map(function(b){ return '<li>'+esc(b)+'</li>'; }).join('');
-      var faqsHTML = d.faqs.map(function(f){ return '<div class="faq-item"><div class="faq-dot"></div><div class="faq-body"><div class="faq-q">'+esc(f.q)+'</div><div class="faq-a">'+esc(f.a)+'</div></div></div>'; }).join('');
+      var tnas = tasasSorted.map(function(t){ return n(t.tna); }).filter(function(v){ return v > 0; });
+      var tnaMaxima = tnas.length ? Math.max.apply(null, tnas) : 0;
+      var tnaCardsHTML = tasasSorted.map(function(t){
+        return '<div class="cr2-tna-card"><div class="cr2-tna-label">Invirtiendo desde</div><div class="cr2-tna-monto">'+fmtUSD(t.desde)+'</div><div class="cr2-tna-val">'+fmtPct(t.tna,2)+'<span class="unit">TNA</span></div></div>';
+      }).join('') || '<div class="cr2-tna-card"><div class="cr2-tna-label">Cargá los tramos de tasa a la izquierda.</div></div>';
 
+      var bulletsInv = d.tipoInversionBullets.filter(function(b){return b.trim();});
+      var desembolsoLabel = d.primerDesembolsoLabel || 'Primer Desembolso';
+      var subtitle = [desembolsoLabel].concat(bulletsInv).join(' · ');
+
+      var montoCreditoHTML = n(d.lineaCreditoTotal) > 0
+        ? fmtUSD(d.primerDesembolso)+' <span style="color:var(--doc2-muted);font-weight:600;">(línea '+fmtUSD(d.lineaCreditoTotal)+')</span>'
+        : fmtUSD(d.primerDesembolso);
+      var tasacionHTML = n(d.tasacionProyectada) > 0
+        ? fmtUSD(d.tasacionGarantia)+' <span style="color:var(--doc2-muted);font-weight:600;">(proy. '+fmtUSD(d.tasacionProyectada)+')</span>'
+        : fmtUSD(d.tasacionGarantia);
+      var amortizacionHTML = esc(d.amortizacionTitulo) + (d.amortizacionSub ? ' — '+esc(d.amortizacionSub) : '');
+
+      var condItems = [
+        ['Tipo de inversión', esc(bulletsInv[0] || 'Renta fija')],
+        ['Tipo de garantía', esc(d.tipoGarantia)],
+        ['Moneda', esc(d.moneda)],
+        ['Amortización', amortizacionHTML],
+        ['Monto del crédito', montoCreditoHTML],
+        ['Tasación garantía', tasacionHTML],
+        ['Ubicación', esc(d.ubicacion || '—')],
+        ['Fecha estimada', esc(fmtFecha(d.fechaEstimada))]
+      ];
+      var condGridHTML = condItems.map(function(it){
+        return '<div class="cr2-cond-item"><div class="cr2-cond-label">'+it[0]+'</div><div class="cr2-cond-val">'+it[1]+'</div></div>';
+      }).join('');
+
+      var formatoTexto = d.formatoGarantia.filter(function(b){return b.trim();}).map(esc).join(' · ');
+      var detailRowsHTML = '<div class="cr2-detail-row"><div class="cr2-detail-label">Descripción</div><div class="cr2-detail-content">'+nl2p(d.garantiaInfo)+'</div></div>'
+        + (d.garantiaInfoExtra.trim() ? '<div class="cr2-detail-row"><div class="cr2-detail-label">Aforo</div><div class="cr2-detail-content">'+nl2p(d.garantiaInfoExtra)+'</div></div>' : '')
+        + (formatoTexto ? '<div class="cr2-detail-row"><div class="cr2-detail-label">Formato</div><div class="cr2-detail-content">'+formatoTexto+'.</div></div>' : '');
+
+      var faqsHTML = d.faqs.map(function(f){ return '<div><div class="cr2-faq-q">'+esc(f.q)+'</div><div class="cr2-faq-a">'+esc(f.a)+'</div></div>'; }).join('');
+
+      var tituloLimpio = tituloCorto(d.operacion);
       return ''
-        + '<div class="doc-header"><div class="doc-logo">'+logoBlockHtml()+'</div></div>'
-        + '<div class="doc-h1">OPORTUNIDAD DE INVERSIÓN</div>'
-        + '<div class="doc-top-row"><div class="op-box"><div class="op-box-title">Operación: '+esc(d.operacion||'Nombre de la operación')+'</div><div class="op-box-sub">Tipo de inversión:</div><ul class="op-bullets">'+bulletsInv+'</ul></div>'
-        + '<div class="tna-box"><div class="tna-head"><span>Rendimiento del Dinero</span><span class="tna-head-r">Tasa Anual (TNA)</span></div>'+tasasRowsHTML+'</div></div>'
-        + '<div class="cards-row cards-olive">'
-        +   card('Tasación de la Garantía', tasacionCardHTML)
-        +   card('Monto Del Crédito Otorgado Al Tomador', montoCreditoHTML)
-        +   card('Plazo de la Inversión', '<div class="card-val-strong">'+(n(d.plazoMeses)||0)+' Meses</div>')
-        +   card('Inversión Mínima', '<div class="card-val-strong">'+fmtUSD(d.inversionMinima)+'</div>')
+        + '<div class="doc-header"><div class="doc-logo">'+logoBlockHtml()+'</div><div class="cr2-kicker">Ficha de inversión<br>'+esc(tituloLimpio)+'</div></div>'
+        + '<div class="cr2-title-row"><div><div class="cr2-eyebrow">Oportunidad de inversión</div><div class="cr2-title">'+esc(tituloLimpio)+'</div></div><div class="cr2-subtitle">'+esc(subtitle)+'</div></div>'
+        + '<div class="cr2-kpi-row">'
+        +   '<div class="cr2-kpi"><div class="cr2-kpi-label">Tasa anual — hasta</div><div class="cr2-kpi-val">'+fmtPct(tnaMaxima,2)+'<span class="unit">TNA</span></div></div>'
+        +   '<div class="cr2-kpi"><div class="cr2-kpi-label">Plazo</div><div class="cr2-kpi-val">'+(n(d.plazoMeses)||0)+'<span class="unit">meses</span></div></div>'
+        +   '<div class="cr2-kpi"><div class="cr2-kpi-label">Este desembolso</div><div class="cr2-kpi-val">'+fmtUSD(d.primerDesembolso)+'</div></div>'
+        +   '<div class="cr2-kpi"><div class="cr2-kpi-label">Inversión mínima</div><div class="cr2-kpi-val">'+fmtUSD(d.inversionMinima)+'</div></div>'
         + '</div>'
-        + '<div class="cards-row cards-steel">'
-        +   card('Tipo De Inversión', '<div class="card-val-strong">Renta Fija</div>')
-        +   card('Tipo De Garantía', '<div class="card-val-strong">'+esc(d.tipoGarantia)+'</div>')
-        +   card('Moneda', '<div class="card-val-strong">'+esc(d.moneda)+'</div>')
-        +   card('Sistema de Amortización', '<div class="card-val-strong">'+esc(d.amortizacionTitulo)+'</div><div class="card-sub">'+esc(d.amortizacionSub)+'</div>')
-        + '</div>'
-        + '<div class="doc-h2">Detalles de la Garantía</div>'
-        + '<div class="detail-table">'
-        +   '<div class="detail-row"><div class="detail-label olive">Información de la Garantía</div><div class="detail-content">'+nl2p(d.garantiaInfo)+tasacionDetailHTML+nl2p(d.garantiaInfoExtra)+'</div></div>'
-        +   '<div class="detail-row"><div class="detail-label steel">Formato de la Garantía</div><div class="detail-content"><ul class="plain-bullets">'+formatoGarRows+'</ul></div></div>'
-        +   '<div class="detail-row"><div class="detail-label steel">Fecha Estimada de la Inversión</div><div class="detail-content">'+esc(fmtFecha(d.fechaEstimada))+'.</div></div>'
-        + '</div>'
-        + '<div class="doc-h2">Preguntas Frecuentes</div>'
-        + '<div class="faqs">'+faqsHTML+'</div>';
+        + '<div class="cr2-section"><div class="cr2-section-head"><span class="cr2-section-num">01</span> Rendimiento del capital</div><div class="cr2-section-body"><div class="cr2-tna-row">'+tnaCardsHTML+'</div></div></div>'
+        + '<div class="cr2-section"><div class="cr2-section-head"><span class="cr2-section-num">02</span> Condiciones de la operación</div><div class="cr2-section-body"><div class="cr2-cond-grid">'+condGridHTML+'</div></div></div>'
+        + '<div class="cr2-section"><div class="cr2-section-head"><span class="cr2-section-num">03</span> Detalles de la garantía</div><div class="cr2-section-body">'+detailRowsHTML+'</div></div>'
+        + '<div class="cr2-section"><div class="cr2-section-head"><span class="cr2-section-num">04</span> Preguntas frecuentes</div><div class="cr2-section-body"><div class="cr2-faqs">'+faqsHTML+'</div></div></div>'
+        + '<div class="cr2-footer"><div class="doc-logo">'+logoBlockHtml()+'</div><div class="cr2-contact"><span>inversiones@smartans.pro · (+54 9) 11 3525-2013</span><span>smartans.pro</span></div></div>';
     }
 
     function updateDerivedBox(calc){
@@ -1412,6 +1428,11 @@
         state = cloneState(EXAMPLE);
         bindFormFromState(); render();
         showToast('Ejemplo cargado (Lavalle 796).');
+      });
+      document.getElementById('crBtnExample2').addEventListener('click', function(){
+        state = cloneState(EXAMPLE_2);
+        bindFormFromState(); render();
+        showToast('Ejemplo cargado (Shale, Vaca Muerta).');
       });
       document.getElementById('crBtnExport').addEventListener('click', function(){
         exportarPDF('previewCredito', state.operacion || 'ficha_credito', '#ffffff');
@@ -1458,26 +1479,49 @@
   })();
 
   /* ============================================================
-     PORTAL: listado, persistencia multi-ficha, navegación
+     PORTAL: listado, persistencia multi-ficha (backend compartido), navegación
   ============================================================ */
-  var DB_KEY = 'smartans_portal_fichas_v1';
+
+  /* helper genérico para pegarle al Apps Script con la sesión del usuario logueado
+     (a diferencia de usersRequest, que manda adminUser/adminPassword: esto es para
+     acciones que puede usar cualquier usuario activo, no sólo un admin) */
+  function apiRequest(action, extra){
+    var body = Object.assign({action: action, usuario: currentUser.usuario, password: currentUser.password}, extra || {});
+    return fetch(APPS_SCRIPT_URL, {
+      method:'POST', headers:{'Content-Type':'text/plain'}, body: JSON.stringify(body)
+    }).then(function(r){ return r.json(); });
+  }
+
   var DB = {fichas: []};
   var currentId = null;
-  var saveTimer = null;
+  var saveTimers = {}; // debounce de guardado por ficha (clave = id)
 
   function loadDB(){
-    try{ var raw = localStorage.getItem(DB_KEY); if(raw){ DB = JSON.parse(raw); return; } }catch(e){}
-    DB = {fichas: []};
+    return apiRequest('listFichas').then(function(resp){
+      DB = { fichas: resp.ok ? resp.fichas.map(function(f){
+        return {
+          id: f.id, tipo: f.tipo, nombre: f.nombre,
+          updatedAt: f.updatedAt ? new Date(f.updatedAt).getTime() : Date.now(),
+          data: f.data, hero: f.hero || null, logo: f.logo || null
+        };
+      }) : [] };
+    }).catch(function(){ DB = {fichas: []}; });
   }
-  function persist(){
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(function(){ try{ localStorage.setItem(DB_KEY, JSON.stringify(DB)); }catch(e){} }, 400);
+  /* guarda UNA ficha en el backend (debounced) — se llama desde cada punto que la modifica */
+  function persistFicha(f){
+    clearTimeout(saveTimers[f.id]);
+    saveTimers[f.id] = setTimeout(function(){
+      apiRequest('saveFicha', {id:f.id, tipo:f.tipo, nombre:f.nombre, data:f.data, hero: f.hero || null, logo: f.logo || null})
+        .then(function(resp){ if(!resp.ok) console.error('No se pudo guardar la ficha:', resp.error); })
+        .catch(function(err){ console.error('No se pudo guardar la ficha:', err); });
+    }, 500);
   }
   function seedIfEmpty(){
     if(DB.fichas.length) return;
-    DB.fichas.push({id:uid(), tipo:'canje', nombre:'Ugarte 2729', updatedAt:Date.now(), data:Canje.EXAMPLE, hero:EXAMPLE_HERO_DATAURL, logo:null});
-    DB.fichas.push({id:uid(), tipo:'credito', nombre:'Edificio Lavalle 796, CABA (Primer Desembolso)', updatedAt:Date.now()-60000, data:Credito.EXAMPLE});
-    persist();
+    var f1 = {id:uid(), tipo:'canje', nombre:'Ugarte 2729', updatedAt:Date.now(), data:Canje.EXAMPLE, hero:EXAMPLE_HERO_DATAURL, logo:null};
+    var f2 = {id:uid(), tipo:'credito', nombre:'Edificio Lavalle 796, CABA (Primer Desembolso)', updatedAt:Date.now()-60000, data:Credito.EXAMPLE, hero:null, logo:null};
+    DB.fichas.push(f1, f2);
+    persistFicha(f1); persistFicha(f2);
   }
 
   function fmtDate(ts){
@@ -1538,7 +1582,7 @@
         f.data = state; f.hero = hero; f.logo = logo;
         f.nombre = Canje.displayName();
         f.updatedAt = Date.now();
-        persist();
+        persistFicha(f);
       });
     } else {
       showView('credito');
@@ -1546,29 +1590,22 @@
         f.data = state;
         f.nombre = Credito.displayName();
         f.updatedAt = Date.now();
-        persist();
+        persistFicha(f);
       });
     }
   }
 
-  function newFicha(tipo, presetKey){
-    var baseData;
-    if(tipo === 'canje'){
-      baseData = Object.assign({}, Canje.BLANK);
-    } else if(presetKey === 'credito2'){
-      baseData = JSON.parse(JSON.stringify(Credito.EXAMPLE_2));
-    } else {
-      baseData = Object.assign({}, Credito.BLANK);
-    }
+  function newFicha(tipo){
+    var baseData = tipo === 'canje' ? Object.assign({}, Canje.BLANK) : Object.assign({}, Credito.BLANK);
     var f = {
       id: uid(), tipo: tipo,
-      nombre: presetKey === 'credito2' ? 'Crédito con Garantía II' : 'Ficha sin título',
+      nombre: 'Ficha sin título',
       updatedAt: Date.now(),
       data: baseData,
       hero: null, logo: null
     };
     DB.fichas.push(f);
-    persist();
+    persistFicha(f);
     document.getElementById('modalNueva').classList.remove('show');
     openFicha(f.id);
   }
@@ -1576,9 +1613,12 @@
   /* ============================================================
      NOTIFICACIONES — Slack (webhook) + Telegram (Bot API) + Email (mailto)
   ============================================================ */
-  var NOTIF_KEY = 'smartans_portal_notif_v1';
-  function loadNotifConfig(){ try{ return JSON.parse(localStorage.getItem(NOTIF_KEY)) || {}; }catch(e){ return {}; } }
-  function saveNotifConfig(cfg){ try{ localStorage.setItem(NOTIF_KEY, JSON.stringify(cfg)); }catch(e){} }
+  function loadNotifConfig(){
+    return apiRequest('getNotifConfig').then(function(resp){ return resp.ok ? resp.config : {}; }).catch(function(){ return {}; });
+  }
+  function saveNotifConfig(cfg){
+    return apiRequest('saveNotifConfig', {config: cfg}).catch(function(){});
+  }
 
   function sendSlackWebhook(url, msg){
     return fetch(url, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: msg})});
@@ -1594,9 +1634,10 @@
   }
   /* dispara la alerta a todos los canales configurados; nunca rechaza (cada canal falla en silencio si no está configurado o da error) */
   function notifyAllChannels(msg){
-    var cfg = loadNotifConfig();
-    if(cfg.slackWebhook) sendSlackWebhook(cfg.slackWebhook, msg).catch(function(){});
-    if(cfg.telegramToken && cfg.telegramChat) sendTelegramMessage(cfg.telegramToken, cfg.telegramChat, msg).catch(function(){});
+    loadNotifConfig().then(function(cfg){
+      if(cfg.slackWebhook) sendSlackWebhook(cfg.slackWebhook, msg).catch(function(){});
+      if(cfg.telegramToken && cfg.telegramChat) sendTelegramMessage(cfg.telegramToken, cfg.telegramChat, msg).catch(function(){});
+    }).catch(function(){});
   }
   function setNotifStatus(id, msg, kind){
     var el = document.getElementById(id);
@@ -1605,17 +1646,26 @@
   }
 
   function initNotifModule(){
-    var cfg = loadNotifConfig();
     var slackWebhook = document.getElementById('notifSlackWebhook');
     var tgToken = document.getElementById('notifTelegramToken');
     var tgChat = document.getElementById('notifTelegramChat');
     var emailTo = document.getElementById('notifEmailTo');
-    slackWebhook.value = cfg.slackWebhook || '';
-    tgToken.value = cfg.telegramToken || '';
-    tgChat.value = cfg.telegramChat || '';
-    emailTo.value = cfg.emailTo || '';
+    var cfg = {};
+    var persistTimer = null;
 
-    function persist(key, value){ cfg[key] = value; saveNotifConfig(cfg); }
+    loadNotifConfig().then(function(c){
+      cfg = c;
+      slackWebhook.value = cfg.slackWebhook || '';
+      tgToken.value = cfg.telegramToken || '';
+      tgChat.value = cfg.telegramChat || '';
+      emailTo.value = cfg.emailTo || '';
+    });
+
+    function persist(key, value){
+      cfg[key] = value;
+      clearTimeout(persistTimer);
+      persistTimer = setTimeout(function(){ saveNotifConfig(cfg); }, 500);
+    }
     slackWebhook.addEventListener('input', function(e){ persist('slackWebhook', e.target.value); });
     tgToken.addEventListener('input', function(e){ persist('telegramToken', e.target.value); });
     tgChat.addEventListener('input', function(e){ persist('telegramChat', e.target.value); });
@@ -1656,13 +1706,21 @@
   /* ============================================================
      MONITOREO — chequeo HTTP periódico + alerta por notifyAllChannels
   ============================================================ */
-  var MONITOR_KEY = 'smartans_portal_monitor_v1';
   var MONITOR_INTERVAL_MS = 30000;
   var monitorData = null;
   var monitorTimer = null;
 
-  function loadMonitor(){ try{ return JSON.parse(localStorage.getItem(MONITOR_KEY)) || {services:[]}; }catch(e){ return {services:[]}; } }
-  function saveMonitor(m){ try{ localStorage.setItem(MONITOR_KEY, JSON.stringify(m)); }catch(e){} }
+  /* la LISTA de servicios (nombre+url) es compartida vía backend; el estado de cada
+     chequeo (arriba/caído/latencia) es efímero y se recalcula en cada pestaña — no
+     tiene sentido persistirlo, cada cliente corre su propio timer de 30s. */
+  function loadMonitor(){
+    return apiRequest('listServicios').then(function(resp){
+      var services = resp.ok ? resp.servicios.map(function(s){
+        return {id:s.id, name:s.name, url:s.url, status:'unknown', lastCheck:null, lastLatencyMs:null, corsBlocked:false};
+      }) : [];
+      return {services: services};
+    }).catch(function(){ return {services: []}; });
+  }
   function fmtLatency(ms){ return ms==null ? '—' : ms+' ms'; }
   function fmtAgo(ts){
     if(!ts) return 'nunca';
@@ -1731,28 +1789,31 @@
         svc.status = 'down';
         if(!wasDown) notifyAllChannels('🔴 ' + svc.name + ' no responde (' + svc.url + ').');
       }
-      saveMonitor(monitorData);
       renderMonitor();
     });
   }
 
   function checkAllServices(){
+    if(!monitorData) return;
     monitorData.services.forEach(function(s){ runCheck(s); });
   }
 
   function initMonitorModule(){
-    monitorData = loadMonitor();
-    renderMonitor();
+    loadMonitor().then(function(m){
+      monitorData = m;
+      renderMonitor();
+      checkAllServices();
+    });
 
     document.getElementById('monAdd').addEventListener('click', function(){
       var name = document.getElementById('monName').value.trim();
       var url = document.getElementById('monUrl').value.trim();
-      if(!name || !url) return;
+      if(!name || !url || !monitorData) return;
       var svc = {id: uid(), name:name, url:url, status:'unknown', lastCheck:null, lastLatencyMs:null, corsBlocked:false};
       monitorData.services.push(svc);
-      saveMonitor(monitorData);
       document.getElementById('monName').value = ''; document.getElementById('monUrl').value = '';
       renderMonitor();
+      apiRequest('saveServicio', {id:svc.id, name:svc.name, url:svc.url}).catch(function(){});
       runCheck(svc);
     });
 
@@ -1760,14 +1821,14 @@
 
     document.getElementById('monBody').addEventListener('click', function(e){
       var btn = e.target.closest('[data-action]');
-      if(!btn) return;
+      if(!btn || !monitorData) return;
       var id = btn.dataset.id;
       var svc = monitorData.services.filter(function(s){ return s.id === id; })[0];
       if(btn.dataset.action === 'check' && svc){ runCheck(svc); }
       else if(btn.dataset.action === 'del'){
         monitorData.services = monitorData.services.filter(function(s){ return s.id !== id; });
-        saveMonitor(monitorData);
         renderMonitor();
+        apiRequest('deleteServicio', {id:id}).catch(function(){});
       }
     });
 
@@ -1917,7 +1978,6 @@
     document.getElementById('modalNueva').addEventListener('click', function(e){ if(e.target.id === 'modalNueva') document.getElementById('modalNueva').classList.remove('show'); });
     document.getElementById('optCanje').addEventListener('click', function(){ newFicha('canje'); });
     document.getElementById('optCredito').addEventListener('click', function(){ newFicha('credito'); });
-    document.getElementById('optCreditoII').addEventListener('click', function(){ newFicha('credito', 'credito2'); });
 
     document.getElementById('fichasBody').addEventListener('click', function(e){
       var btn = e.target.closest('[data-action]');
@@ -1930,23 +1990,25 @@
         if(!f) return;
         var copy = JSON.parse(JSON.stringify(f));
         copy.id = uid(); copy.nombre = f.nombre + ' (copia)'; copy.updatedAt = Date.now();
-        DB.fichas.push(copy); persist(); renderList();
+        DB.fichas.push(copy); persistFicha(copy); renderList();
         showToast('Ficha duplicada.');
       } else if(action === 'del'){
         if(!confirm('¿Eliminar esta ficha? Esta acción no se puede deshacer.')) return;
         DB.fichas = DB.fichas.filter(function(x){ return x.id !== id; });
-        persist(); renderList();
+        renderList();
+        apiRequest('deleteFicha', {id:id}).catch(function(){});
         showToast('Ficha eliminada.');
       }
     });
   }
 
   function initApp(){
-    loadDB();
-    seedIfEmpty();
     initEvents();
     showView('list');
-    renderList();
+    loadDB().then(function(){
+      seedIfEmpty();
+      renderList();
+    });
   }
 
   /* ============================================================

@@ -44,11 +44,12 @@ Usa el mismo Apps Script que ya tenías para Drive — hay que actualizarlo:
 
 ## Dónde vive la información
 
-Las fichas se guardan en el `localStorage` del navegador (clave `smartans_portal_fichas_v1`), **no en un servidor**. Esto significa:
+Fichas, la configuración de Notificaciones y la lista de servicios de Monitoreo **ya no viven en el `localStorage` de cada navegador** — se guardan en la misma Google Sheet que usan los usuarios, a través del Apps Script. Esto significa:
 
-- Los datos quedan en esa PC y ese navegador; no se comparten entre dispositivos.
-- Si se borra el historial/datos de navegación del sitio, o se abre el archivo desde otra carpeta/URL, las fichas guardadas no van a aparecer.
-- Para compartir una ficha con otra persona, la forma confiable es exportarla a PDF y enviar ese archivo — no el estado guardado en el navegador.
+- Todo el equipo ve los mismos datos, en cualquier PC o navegador, apenas inicia sesión.
+- Las imágenes de la ficha "Canje de tierra" (foto + logo) se suben a la carpeta de Drive y sólo se guarda su referencia en la Sheet (una celda no aguanta una imagen en base64).
+- Cada cambio se autoguarda al backend con un pequeño debounce (½ segundo) — igual que antes, no hace falta un botón "Guardar".
+- Si el backend no responde (sin conexión, `APPS_SCRIPT_URL` mal configurada), el portal sigue funcionando en memoria durante esa sesión, pero lo que no llegó a guardarse se pierde al recargar.
 
 ## Enviar por WhatsApp con el PDF en Google Drive
 
